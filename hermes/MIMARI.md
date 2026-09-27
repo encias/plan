@@ -11,7 +11,7 @@
 
 1. **Temel mimari:** Hermes bir "sohbet sürüsü" değil; **iş defteri + küçük deterministik çekirdek + geçici LLM işçileri.** LLM'ler kontrol akışına sahip değil; durum sohbette değil defterde yaşıyor; her çağrının context'i yeniden *derleniyor*, birikmiyor.
 2. **En önemli bulgu:** Hermes Agent bu çekirdeğin büyük kısmını **zaten sağlıyor** — dayanıklı Kanban görev defteri (sahiplenme, çöken işçiyi geri alma, sahiplik kontrollü tamamlama, idempotency anahtarı, bağımlılıklar, inceleme akışı), cron, profiller, onaylar, panel. **Karar: ikinci bir görev defteri kurmuyoruz; Kanban otoritedir.**
-3. **Bizim ekleyeceğimiz yalnızca dört parça:** (1) kodla ve işletim sistemi izinleriyle uygulanan **anayasa** (deny-only middleware); (2) **model kapısı** (kayıt, kota, sağlık, veri hassasiyetine göre yönlendirme); (3) **bilgi derleyici** (gözlem → küratörlü, git'te sürümlü bilgi → göreve özel paket); (4) **brief-katlama** (Hermes'in yorum dizisinin tamamını her işçiye vermesini sınırlar).
+3. **Bizim ekleyeceğimiz yalnızca dört parça:** (1) **anayasa** — işletim sistemi izinleri, yetenek minimizasyonu ve konteynerle uygulanır; üstüne hata ve zaman aşımında aracı *engelleyen* (`fail_closed`) bir `pre_tool_call` politika kancası; (2) **model kapısı** (kayıt, kota, sağlık, veri hassasiyetine göre yönlendirme) — kanıt kapılı, ihtiyaç ölçülünce; (3) **bilgi derleyici** (gözlem → küratörlü, git'te sürümlü bilgi → göreve özel paket) — önce insan kapılı; (4) **brief-katlama** (Hermes'in yorum dizisinin tamamını her işçiye vermesini sınırlar).
 4. **Zemin:** WSL2 içinde izole bir "Hermes cihazı" — babanın dosyalarına, tarayıcısına, e-postasına erişemez. Tailscale ile uzaktan bakım, ölü-adam anahtarı, test edilmiş yedek.
 5. **"Limitsiz ücretsiz model" yok.** Ücretsiz katmanlar kotalı, oynak ve bir kısmı veriyi eğitimde kullanıyor. Tek gerçekten sınırsız katman **yerel model**. Mimari bolluk için değil kıtlık için tasarlandı; babanın hassas verisi yapısal olarak yalnızca yerel/onaylı modellere gider.
 6. **İletişim:** Ortak sohbet odası yok. **Kart = göreve özel oda**; yaşayan özet (brief) + kararlar + ekler + yapılandırılmış devirler. Mesajlar özete katlanınca context'ten çıkar. Yeni katılan ve yeniden başlayan işçi aynı yoldan, 2–4k token'la durumu kurar.
@@ -24,6 +24,18 @@
 13. **Yol haritası:** 8 faz. Faz 0–1 otonomisiz; baba Faz 2'de devreye giriyor; öğrenme en sonda (Faz 7) ve kapılı.
 
 **Nasıl okunmalı:** Karar vermek için §0, §2, §22, §23, §24. Uygulayıcı için her bölüm kendi başına okunabilir; ajanlara verilecekse de tamamı değil, ilgili bölüm verilmeli (bu belgenin kendisi de "context derlenir" ilkesine göre bölümlendi).
+
+**v1.1 — karşı-görüş incelemesinden sonra yapılan düzeltmeler (hepsi kaynak koddan doğrulandı):**
+
+- Politika kapısı *middleware*'den `fail_closed` bir `pre_tool_call` kancasına taşındı: Hermes middleware'i hata durumunda işlemi geçiriyor (fail-open).
+- Tekrarlayan sistem işleri cron'un LLM'siz script modunda; LLM çağrısı sıfır.
+- `config.yaml` salt-okunur kararı netleşti; kanca için kanarya testi eklendi.
+- `isci` terminali Faz 1'den itibaren Docker'da (önceki taslakta Faz 2 ile Faz 5 arasında çelişki vardı).
+- Model kapısı ve hafıza otomasyonu *kanıt kapılı* yapıldı; JEV denemesi ölçülmüş bir sorun şartına bağlandı; hedef hiyerarşisi uygulamada hafifletildi.
+- WSL'in otomatik başlatılması için Hermes'in kendi belgelediği yedek yol eklendi; yerel Windows alternatifi reddedildi.
+- Asılı işçi eşiği 4 saatten 30–45 dakikaya indirildi.
+- İncelemenin iki iddiası doğrulamada tutmadı ve uygulanmadı: "cron'un LLM'siz modu yok" (var) ve "çöken işçi 4 saat bekler" (çöken işçi ≤ 60 sn'de geri alınır; 4 saat yalnızca asılı kalan işçi için).
+
 
 ## 1. Temel mimari: Defter + Çekirdek + Geçici İşçiler
 
@@ -39,7 +51,7 @@ Hermes'in merkezinde bir model, bir "ana ajan" ya da bir sohbet **olmamalı**. M
 | **Hafıza derleyicisi** | Ham gözlemi → aday bilgiye → küratörlü, sürümlü, küçük bilgiye dönüştürür | Evet (toplu, ucuz) | Zamanlanmış toplu iş |
 | **İnsan yüzeyleri** | Sahip (baban) için sohbet + onay; bakımcı (sen) için gözlem paneli + CLI | Karşılama katmanında evet | Kalıcı |
 
-**Fiziksel karşılık:** Bu tablodaki "çekirdeğin" büyük kısmını Hermes Agent zaten sağlıyor (Kanban görev defteri ve dispatcher'ı, cron, onaylar, profiller, panel). Biz yalnızca eksik dört parçayı ekliyoruz: politika middleware'i, model kapısı, bilgi derleyici, brief-katlama. Ayrıntı §15'te. Mantıksal tasarım Hermes'in sürümünden bağımsız kalsın diye önce kavramsal olarak anlatılıyor.
+**Fiziksel karşılık:** Bu tablodaki "çekirdeğin" büyük kısmını Hermes Agent zaten sağlıyor (Kanban görev defteri ve dispatcher'ı, cron, onaylar, profiller, panel). Biz yalnızca eksik dört parçayı ekliyoruz: politika kancası, model kapısı, bilgi derleyici, brief-katlama. Ayrıntı §15'te. Mantıksal tasarım Hermes'in sürümünden bağımsız kalsın diye önce kavramsal olarak anlatılıyor.
 
 Kısacası: **LLM bir CPU'dur, işletim sistemi değil.** Durum (state) LLM'in içinde, sohbette ya da ajanın "aklında" yaşamaz; defterde yaşar. LLM her çağrıda defterden *derlenmiş* küçük bir durum görür, bir öneri/artefakt üretir ve gider.
 
@@ -330,6 +342,14 @@ Eski sistemin en büyük hatalarından biri: bilgi, kullanılabilir hafızaya d�
 - Açık çelişki sayısı
 - 90 günde hiç getirilmemiş bilgi oranı (yüksekse gereksiz saklıyoruz)
 - Getirme kalitesi: küçük bir test seti ("X görevi için paket A ve B gerçeklerini içermeli") üzerinde isabet
+
+### 4.9 Uygulama sırası: tasarım tam, kurulum kademeli
+
+Bu bölüm hedef mimariyi tarif ediyor; hepsi ilk gün kurulmaz. Tek bir hanenin hacmi düşük olacak ve erken otomasyon, eski sistemin "meşguliyet" hastalığını geri getirir:
+
+- **Faz 2:** `USER.md` (yalnızca babanın teyit ettiği açık tercihler) + elle tutulan birkaç `knowledge/*.md` dosyası. Haftalık gözden geçirmede `kurator` kartı yalnızca bir *değişiklik önerisi* (diff) hazırlar; sen uygularsın.
+- **Faz 4:** Triyaj, birleştirme, otomatik kapı ve çürüme ancak **hacim gerektirince** otomatikleşir (haftalık elle küratörlük 30 dakikayı aşarsa ya da bekleyen gözlem eşiği geçilirse).
+- Katmanlar, şema, bütçeler ve sağlık ölçütleri ilk günden *kural* olarak geçerlidir; değişen yalnızca kimin uyguladığıdır (önce sen, sonra küratör).
 ---
 
 ## 5. Anayasa / kurallar katmanı
@@ -342,7 +362,7 @@ Eski sistemin en büyük hatalarından biri: bilgi, kullanılabilir hafızaya d�
 | **Politika** | Şerit bütçeleri, rol başına araç izinleri, saklama süreleri, onay eşikleri (anayasanın altında), sessiz saatler, yönlendirme kısıtları | Bakımcı; ajanlar yalnızca **önerir** | Öneri → otomatik doğrulama → bakımcı onayı → sürümlü yükleme | "Araştırma şeridi günlük en fazla 40 istek" |
 | **Konfigürasyon** | Model kaydı, uç noktalar, zaman aşımları, eşzamanlılık, prompt şablonları | Bakımcı; çekirdek **politika sınırları içinde** otomatik ayar yapabilir | Git commit; otomatik ayarlar olay günlüğüne yazılır | "Groq zaman aşımı 45 sn" |
 
-Temel kural: **Anayasa bir prompt değildir.** Anayasa kodla (politika middleware'i), işletim sistemi izinleriyle (salt-okunur dosyalar, ayrı kullanıcı) ve yetenek minimizasyonuyla (profil başına araç seti) uygulanır. Prompt'taki metin yalnızca modelin boşuna denememesi içindir. LLM ikna edilebilir, kandırılabilir, şaşırabilir; dosya izni ve kod kontrolü ikna edilemez.
+Temel kural: **Anayasa bir prompt değildir.** Anayasa kodla (hata durumunda engelleyen politika kancası), işletim sistemi izinleriyle (salt-okunur dosyalar, ayrı kullanıcı) ve yetenek minimizasyonuyla (profil başına araç seti) uygulanır. Prompt'taki metin yalnızca modelin boşuna denememesi içindir. LLM ikna edilebilir, kandırılabilir, şaşırabilir; dosya izni ve kod kontrolü ikna edilemez.
 
 ### 5.2 Anayasa maddeleri (ilk sürüm önerisi)
 
@@ -368,11 +388,17 @@ Temel kural: **Anayasa bir prompt değildir.** Anayasa kodla (politika middlewar
 |---|---|---|
 | 1. İşletim sistemi | Hermes ayrı bir kullanıcıyla çalışır; `policy/`, Hermes `config.yaml` ve eklenti klasörü o kullanıcıya **salt-okunur**; WSL2'de Windows disklerinin otomatik bağlanması ve Windows programlarını çalıştırma (interop) kapalı | Her şeyi — model ne derse desin |
 | 2. Profil araç setleri | Her rolde yalnızca gereken araçlar; babanla konuşan profilde terminal yok | Yeteneği hiç olmayan eylemi |
-| 3. Politika middleware'i (kod) | Her araç çağrısı ve model çağrısı öncesi `allow / deny / require_approval`; yalnızca *reddetme* yetkisi olan ek bir kapı | Anayasa/politika ihlali |
+| 3. Politika kancası (kod) | Hermes'in `pre_tool_call` kabuk kancası, **`fail_closed: true`**: script hata verir ya da zaman aşımına uğrarsa araç **engellenir** (çıkış kodu 2 = engelle). Kart sözleşmesi, yorum kuralları, yasak yollar (`auth.json`, `.env`, `policy/`, config), sır kalıbı taraması | Anayasa/politika ihlali |
 | 4. Hermes onayları | Tehlikeli komut kalıpları; gözetimsiz modlarda (cron, API, tek sorgu) varsayılan **red** | Riskli terminal komutları |
 | 5. Konteyner | Kod çalıştırma Docker içinde; konteyner = sınır | Kodun ana sisteme dokunmasını |
 | 6. Sır izolasyonu | Alt süreçlere temizlenmiş ortam; sağlayıcı anahtarları alt süreçlere geçmez | Anahtar sızıntısını |
 | 7. Prompt metni | Kısa bilgilendirme | Yalnızca boşa denemeyi |
+
+**Neden middleware değil de kanca?** Hermes'in *middleware* katmanı hata durumunda işlemi **geçirir** (fail-open) — bir güvenlik kapısı için kabul edilemez. `pre_tool_call` kabuk kancası ise `fail_closed: true` ile hata ve zaman aşımında aracı durdurur. Middleware yalnızca başarısızlığı güvenlik açığı yaratmayan ikincil işlerde kullanılır (redaksiyon, brief-katlama).
+
+**Sert taban 1, 2, 5 ve 6. katmanlardır.** Kanca güçlü ama yazılımdır; yapılandırmadan silinir ya da yanlış yazılırsa (Hermes bilinmeyen kanca adlarını uyarıyla atlar) hiç çalışmaz. Bu yüzden:
+- Gateway her başladığında ve saatte bir **kanarya testi**: engellenmesi gereken zararsız bir çağrı (ör. `policy/`'ye yazma) denenir; engellenmezse otonom işler durdurulur ve sana alarm gider.
+- **Karar: `config.yaml`, kanca script'leri ve eklenti dizini `hermes` kullanıcısına salt-okunur.** Hermes'in çalışma anında config'e yazdığı durumlar (onay ekranındaki "her zaman izin ver"in kalıcılaştırılması, bazı onay sorularının kapatılması, tüm kullanıcılara izin köprüsü) zaten sohbetten *kalıcı olarak gevşetilmesini istemediğimiz* şeyler. Faz 1'de Hermes'in bu yazma hatalarını düzgün karşıladığı test edilir; karşılamıyorsa: yazılabilir config + dakikalık bütünlük kontrolü (git'teki sürümle fark → geri yükle + alarm).
 
 ### 5.4 Politika değişikliği yaşam döngüsü
 
@@ -404,6 +430,8 @@ Temel kural: **Anayasa bir prompt değildir.** Anayasa kodla (politika middlewar
 | **Keşif / merak** | — | Yalnızca onaylı öneri | Varsayılan bütçe **0** | "Yeni ücretsiz modelleri dene" (yalnızca eval şeridinde) |
 | **Fırsatçı iş** | — | Sahibin onayladığı "bir gün" listesi | `knowledge/someday.md` | "Eski fotoğrafları tarihe göre klasörle" |
 
+**Uygulamada hafif:** Faz 2–5'te bu hiyerarşi yalnızca üç şeydir: `charter.md`, `priorities.yaml` ve Kanban kartları (proje = etiketli üst kart). Ayrı hedef/proje dosyaları ve biçimsel karar kayıtları (ADR) Faz 6'da ya da ilk gerçek karar geri dönüşünde eklenir. Kavramsal ayrım ise ilk günden geçerlidir, çünkü "tüketicisiz iş yok" kuralı ona dayanır.
+
 ### 6.2 Şeritler (lanes) ve kapasite rezervasyonu
 
 | Şerit | İçerik | Kapasite payı | Kesilebilir mi? |
@@ -414,7 +442,7 @@ Temel kural: **Anayasa bir prompt değildir.** Anayasa kodla (politika middlewar
 | **P3 İyileştirme** | Eval, getirme ayarı | Yalnızca "gece kullanılmazsa yanacak" kota | Evet |
 | **P4 Keşif** | Onaylı keşif projeleri | Varsayılan 0 | Evet |
 
-Kanban'da bu şeritler **öncelik bantlarına** eşlenir (Kanban kartları "önce öncelik, sonra en eski" sırasıyla dağıtır). Bant ataması deterministik bir kuralla yapılır; ajan kendi kartının önceliğini yükseltemez (politika middleware'i `kanban_create`/`edit` çağrılarında bandı doğrular).
+Kanban'da bu şeritler **öncelik bantlarına** eşlenir (Kanban kartları "önce öncelik, sonra en eski" sırasıyla dağıtır). Bant ataması deterministik bir kuralla yapılır; ajan kendi kartının önceliğini yükseltemez (politika kancası `kanban_create`/`edit` çağrılarında bandı doğrular).
 
 ### 6.3 Öncelik nasıl aşağı iner?
 
@@ -454,11 +482,11 @@ etkin_öncelik = şerit_bandı
 
 Hermes'in Kanban'ı doğrulanmış olarak şunları zaten sağlıyor: SQLite'ta kalıcı kartlar; atanan profil; `triage | todo | ready | running | blocked | review | done | archived` durumları; bağımlılık bağları ve otomatik terfi; TTL'li sahiplenme (claim) ve çöken işçinin geri alınması; **sahiplik kontrollü tamamlama** (geri alınmış eski işçi yeni koşunun kartını tamamlayamaz — fiilen fencing); isteğe bağlı **idempotency anahtarı**; öncelik; görev başına yeniden deneme sınırı ve devre kesici; tipli bloklama (`dependency | needs_input | capability | transient`) ve tekrar eden blokları insana yönlendiren döngü kesici; aynı kartta inceleme (review) akışı; yapılandırılmış devir (`summary` + `metadata`); kalıcı ekler; sohbetten açılan kartlarda sonucun sohbete geri bildirilmesi; pano arayüzü.
 
-Bunu dışarıda yeniden yazmak, bakımı sana kalan ve Hermes'in görev durumuyla **ikiye bölünen (split-brain)** bir sistem demek. Kural: **Görev durumu yalnızca Kanban'da yaşar.** Eklediğimiz her şey Kanban'ın üstünde bir *sözleşme* (kart şablonu + doğrulama middleware'i + konvansiyon) ya da Kanban'ın *yanında* ayrı bir konu (model kaydı, kota, bilgi) olur.
+Bunu dışarıda yeniden yazmak, bakımı sana kalan ve Hermes'in görev durumuyla **ikiye bölünen (split-brain)** bir sistem demek. Kural: **Görev durumu yalnızca Kanban'da yaşar.** Eklediğimiz her şey Kanban'ın üstünde bir *sözleşme* (kart şablonu + doğrulama kancası + konvansiyon) ya da Kanban'ın *yanında* ayrı bir konu (model kaydı, kota, bilgi) olur.
 
 ### 7.2 Kart sözleşmesi (spec şablonu)
 
-Karşılama veya planlayıcı kart açarken gövde şu alanları taşır; politika middleware'i eksik alanlı `kanban_create` çağrısını **reddeder**:
+Karşılama veya planlayıcı kart açarken gövde şu alanları taşır; politika kancası eksik alanlı `kanban_create` çağrısını **reddeder**:
 
 ```
 HEDEF:        tek cümle, sonuç odaklı
@@ -497,7 +525,8 @@ KAYNAK:       sahip_isteği | zamanlama:<iş> | bakım | kart:t_ebeveyn
 - **Yeniden kurulum:** Yeni işçi kartı okur (gövde + önceki denemeler + ebeveyn devirleri + yorumlar). Bu okumanın **sınırlı** kalması için §9'daki brief kuralı şart (Hermes varsayılan olarak yorum dizisinin tamamını verir — uzun kartlarda context şişmesinin kaynağı olur).
 - **Dış etkiler (ilk fazlar):** İşçi profillerinde dış etki aracı yok. Sistem taslak üretir, **gönderimi insan yapar** — tam-bir-kez garantisinin en basit ve en sağlam hali.
 - **Dış etkiler (sonraki faz):** Küçük bir "etki servisi" (MCP): `effect.request(tür, içerik, idempotency_key)` → onay kuyruğu (sahip Telegram'da tam içeriği görür, onay içeriğin hash'ine bağlı) → servis tek sefer yürütür, sonucu kaydeder; tekrar deneme önce etki defterine bakar.
-- **Zamanlanmış işler:** Hermes cron (en-fazla-bir-kez sahiplenme, kaçırılan işler için tek "yetişme" çalışması) doğrudan uzun iş yürütmez; **idempotency anahtarı `<iş>-<dönem>` olan bir Kanban kartı açar.** Aynı dönem için ikinci kart açılamaz.
+- **Zamanlanmış işler:** Hermes cron'un **LLM'siz (no-agent) script modu** kullanılır: bakımcıya ait, salt-okunur bir script `hermes kanban create --idempotency-key <iş>-<dönem>` çağırır — sıfır LLM çağrısı; aynı dönem için ikinci kart açılamaz. Cron'un en-fazla-bir-kez sahiplenmesi ve kaçırılan işler için tek "yetişme" çalışması korunur. LLM'li cron işi yalnızca babanın kendi hatırlatmaları için (kısa, yan etkisiz teslimat) izinlidir.
+- **Asılı kalan işçi:** Çöken işçi (süreç öldü) dispatcher'ın bir sonraki turunda (≤ 60 sn) geri alınır. Ama *canlı ama ilerlemeyen* işçi için Hermes'in varsayılan eşiği **4 saat** (`kanban.dispatch_stale_timeout_seconds`) — bu ev için çok uzun: 30–45 dakikaya indirilir; işçiler düzenli heartbeat atar.
 
 ### 7.5 Yeniden deneme ve eskalasyon
 
@@ -526,7 +555,7 @@ Hermes'te her **profil** kendi yapılandırması, araç setleri, model ayarları
 | **karsilama** | Babanla konuşur. Ayrıştırır, hızlı yoldan cevaplar, kart açar, netleştirme sorusu sorar, onay ve sonuçları iletir | Kanban (oluştur/göster/yorum), okuma amaçlı web arama, hafıza (yazma onaylı). **Terminal yok, dosya yazma yok, üçüncü kişiye gönderim yok** | Türkçesi iyi, araç çağırması güvenilir; hassas veri → yerel | Faz 2 |
 | **isci** (genel uygulayıcı) | Kartı yürütür: belge, tablo, özet, dosya düzenleme, basit otomasyon | Çalışma alanında dosya, web okuma, **konteynerde** terminal, belge skill'leri, Kanban işçi araçları | Kartın risk + veri sınıfına göre | Faz 2 |
 | **denetci** (doğrulayıcı) | Kanban inceleme adımı: spec'e göre kontrol, kanıt kontrolü, karar | Artefakt okuma, konteynerde deterministik kontrol script'leri. Üretim aracı yok | Üreticiden **farklı model ailesi**; hakemlik eval'inden geçmiş | Faz 2 |
-| **kurator** (küratör) | Gece kartı: gözlem triyajı, birleştirme, bilgi değişiklik seti | Yalnızca `knowledge/` üzerinde dal/commit açan kısıtlı araç; web yok | Ucuz + yerel ağırlıklı | Faz 4 |
+| **kurator** (küratör) | Gece kartı: gözlem triyajı, birleştirme, bilgi değişiklik seti | Yalnızca `knowledge/` üzerinde dal/commit açan kısıtlı araç; web yok | Ucuz + yerel ağırlıklı | Faz 2 (yalnızca öneri), Faz 4 (otomatik) |
 | **arastirmaci** | Soru + durdurma koşuluyla sınırlı web araştırması; kaynaklı cevap şeması | Web arama/çekme; dış etki aracı yok; web içeriği "güvenilmez" işaretli | Uzun context, araç çağırma | Faz 5 |
 | **planlayici** | Yalnızca karmaşık işlerde: alt kartlar + bağımlılıklar + kabul ölçütleri önerir | Kanban oluştur/bağla (bütçe zarfı içinde). Yürütme aracı yok | En güçlü erişilebilir tier | Faz 5 |
 | **bakim** (tanılayıcı) | Anormallikte log/metrik okur, **düzeltme önerir**; uygulamaz | Salt-okunur log/metrik; öneri aracı | Orta | Faz 6 |
@@ -569,7 +598,7 @@ TESLİM    kanban_complete(summary, metadata{kanıt, ekler, gözlemler≤K, aç�
 ÖLÜM      süreç çıkar; kapanmış kartta oyalanan süreç dispatcher tarafından sonlandırılır
 ```
 
-**Bitiş koşulları (hepsi zorunlu):** teslim edildi · iterasyon sınırı · deneme sınırı · sahiplik kaybedildi · kart iptal edildi · politika reddi (→ `blocked(capability)`) · **ilerleme yok** (N adım boyunca yeni ek, yorum veya durum değişikliği yoksa blokla ve nedenini yaz — Hermes'te hazır olup olmadığı kurulumda doğrulanacak; yoksa middleware ile eklenir).
+**Bitiş koşulları (hepsi zorunlu):** teslim edildi · iterasyon sınırı · deneme sınırı · sahiplik kaybedildi · kart iptal edildi · politika reddi (→ `blocked(capability)`) · **ilerleme yok** (N adım boyunca yeni ek, yorum veya durum değişikliği yoksa blokla ve nedenini yaz — Hermes'te hazır olup olmadığı kurulumda doğrulanacak; yoksa bir kanca ile eklenir).
 
 **Eşzamanlılık:** Ücretsiz katmanda aynı anda 2–3 ajan işçisi yeterli ve gerçekçi; fonksiyon işçileri kota izin verdikçe. Fazla paralellik ücretsiz kotada yalnızca daha hızlı 429 demek.
 
@@ -612,14 +641,14 @@ KATLANAN YORUMLAR: #18–#26
 
 ### 9.3 Uygulanan kurallar (kodla)
 
-Politika middleware'i `kanban_comment` çağrılarında şunları denetler:
+Politika kancası (`pre_tool_call`, fail-closed) `kanban_comment` çağrılarında şunları denetler:
 
 1. Tipli önek zorunlu (`[ÖZET] [KARAR] [SORU] [CEVAP] [DEVİR] [İTİRAZ] [UYARI] [DEĞİŞİKLİK]`).
 2. Uzunluk sınırı (ör. 1.200 karakter). Uzun içerik → ek olarak yüklenir, yorumda referans + tek satır özet.
 3. Aynı içeriğin tekrar yapıştırılması (hash) reddedilir.
 4. `[ÖZET]` yalnızca kartın o anki sahibinden kabul edilir.
 
-`kanban_show` çıktısı işçiye verilmeden önce **brief-katlama** uygulanır: spec + son `[ÖZET]` + ondan sonraki en fazla K yorum + ebeveyn devirleri + kapsamdaki karar başlıkları + ek dizini. Katlanmış yorumlar kayıtta **kalır** (denetim için), ama context'e **girmez**. Son özetten sonra biriken yorum sayısı veya boyutu eşiği aşarsa, bir sonraki işçinin ilk işi yeni `[ÖZET]` yazmaktır (ya da ucuz bir fonksiyon işçisi yazar).
+`kanban_show` çıktısı işçiye verilmeden önce **brief-katlama** uygulanır: spec + son `[ÖZET]` + ondan sonraki en fazla K yorum + ebeveyn devirleri + kapsamdaki karar başlıkları + ek dizini. Katlanmış yorumlar kayıtta **kalır** (denetim için), ama context'e **girmez**. Son özetten sonra biriken yorum sayısı veya boyutu eşiği aşarsa, bir sonraki işçinin ilk işi yeni `[ÖZET]` yazmaktır (ya da ucuz bir fonksiyon işçisi yazar). Brief-katlama bir dönüştürme (transform) katmanıdır; başarısız olursa işçi tam diziyi görür — güvenlik değil verimlilik kaybı — ve alarm üretilir.
 
 ### 9.4 Kapsamlar
 
@@ -823,7 +852,7 @@ JEV, mimaride bir **"Tipli Karar Servisi"** arayüzünün *adaylarından biri*di
 **JEV'e gidebilecek:** görev tipi, kategori, kısaltılmış/redakte edilmiş, `public` sınıfı kısa metin, aday seçenek listeleri.
 **JEV'e asla gitmeyecek:** kişisel/hassas veri, sırlar, dosya içerikleri, tam transkriptler, sohbet turları, hafızanın tamamı, politika metinleri.
 
-**Uygulama:** Topluluk eklentileri yerine kendi ince adaptörümüz (veri çıkışını biz kontrol edelim diye). Zamanlama: en erken Faz 5, yalnızca gölge mod. Faz 0–4'te hiçbir JEV eklentisi kurulmaz.
+**Uygulama:** Topluluk eklentileri yerine kendi ince adaptörümüz (veri çıkışını biz kontrol edelim diye). Zamanlama: en erken Faz 5, yalnızca gölge mod. Faz 0–4'te hiçbir JEV eklentisi kurulmaz. Ve deneme tek bir koşula bağlı: ölçülmüş bir sorun (ör. triyaj veya cron kapısı kararlarının LLM maliyeti/kotası gerçekten can sıkıyorsa). Sorun yoksa JEV denemesi yapılmaz — merak için deneme, eski sistemin hastalığıdır.
 
 ---
 
@@ -864,12 +893,12 @@ JEV, mimaride bir **"Tipli Karar Servisi"** arayüzünün *adaylarından biri*di
 
 | Mantıksal bileşen | Hermes'te | Karar |
 |---|---|---|
-| Görev defteri, lease/fencing, bağımlılık, idempotency | **Kanban** | **Olduğu gibi kullan** + kart sözleşmesi (middleware doğrulaması) |
-| Tekrarlayan işler | Cron (en-fazla-bir-kez, yetişme politikası) | Kullan; cron yalnızca idempotent kart açar |
+| Görev defteri, lease/fencing, bağımlılık, idempotency | **Kanban** | **Olduğu gibi kullan** + kart sözleşmesi (kanca doğrulaması) |
+| Tekrarlayan işler | Cron (en-fazla-bir-kez, yetişme politikası, **LLM'siz script modu**) | Kullan; sistem işleri yalnızca script modunda ve yalnızca idempotent kart açar |
 | Roller | Profiller | Kullan; profil başına araç seti, model, talimat |
 | Doğrulama | Kanban inceleme akışı + inceleyici profil | Kullan + Türkçe inceleme skill'i |
 | İletişim | Kart yorumları + yapılandırılmış devir + ekler | Kullan + yorum kuralları + **brief-katlama** (eklenti) |
-| Politika motoru | Dağınık (onay modları, toolset'ler, konteyner) | **İnşa et:** deny-only middleware eklentisi (`tool_request`, `llm_request`) + OS izinleri |
+| Politika motoru | Dağınık (onay modları, toolset'ler, konteyner) | **İnşa et:** `fail_closed` `pre_tool_call` kabuk kancası + kanarya testi + OS izinleri. Middleware fail-open olduğu için kapı olarak **kullanılmaz** |
 | Komut onayları | Onay modları; gözetimsiz modlarda varsayılan red | Kullan (`off`/YOLO asla) |
 | Dış etki onayı + tam-bir-kez | Yok | Faz 1–5: insan gönderir. Faz 6+: küçük etki servisi (MCP) |
 | Kısa süreli hafıza | `MEMORY.md` (2.200 kr) + `USER.md` (1.375 kr) | Kullan ama küçük; **yazma onayı açık**; `USER.md` = açık tercihlerin izdüşümü |
@@ -887,9 +916,9 @@ JEV, mimaride bir **"Tipli Karar Servisi"** arayüzünün *adaylarından biri*di
 
 | Durum | Özellikler |
 |---|---|
-| **Açık (Faz 2'den)** | Gateway (babanın seçeceği kanal) · Kanban + pano · cron (yalnızca kart açar) · komut onayları · skills (yazma onaylı) · curator (yalnızca deterministik budama) · küçük hafıza (yazma onaylı) · profiller · web paneli (yalnızca Tailscale, kimlik doğrulamalı) · dosyaların sohbete teslimi (deliverable mode) |
+| **Açık (Faz 2'den)** | Gateway (babanın seçeceği kanal) · Kanban + pano · cron (yalnızca kart açar) · komut onayları · skills (yazma onaylı) · curator (yalnızca deterministik budama) · küçük hafıza (yazma onaylı) · profiller · web paneli (yalnızca Tailscale, kimlik doğrulamalı) · dosyaların sohbete teslimi (deliverable mode) · `isci` terminali Docker'da (Faz 1'den) |
 | **Kapalı** | `/loop`, `/heartbeat` (oturum içi otonomi) · açık uçlu `/goal` · **şifre & giriş kasası (özellikle ödeme/adres doldurma)** · Honcho (bulut kullanıcı modeli; mahremiyet) · Mixture-of-Agents · API sunucusu/webhook/ACP/MCP-sunucu · topluluk eklentileri (JEV ve yönlendirme eklentileri dahil) · skill hub'dan otomatik kurulum · babanın masaüstünde computer-use · onay modu `off` |
-| **Sonra** | Sınırlı `/goal` (Faz 5) · bulut tarayıcı/web arama (Portal Tool Gateway, yalnızca `public`) · iron-proxy (Faz 5) · kendi context-engine eklentimiz (Faz 4) · işçi konteynerlerinde kod (Faz 5) · JEV gölge denemesi (Faz 5+) |
+| **Sonra** | Sınırlı `/goal` (Faz 5) · bulut tarayıcı/web arama (Portal Tool Gateway, yalnızca `public`) · iron-proxy (Faz 5) · kendi context-engine eklentimiz (Faz 4) · JEV gölge denemesi (Faz 5+) |
 
 ### 15.3 Fiziksel yerleşim (tek makine)
 
@@ -898,7 +927,7 @@ Windows 11 (babanın bilgisayarı)
 ├─ Babanın hesabı (günlük kullanım)         ← Hermes buna ERİŞEMEZ
 ├─ Tailscale (bakımcının uzaktan erişimi; port açmadan)
 ├─ Ollama (GPU, yalnızca yerel)             ← T0 tier
-├─ Görev Zamanlayıcı: "başlangıçta, oturum açılmasa da" → WSL'i ayağa kaldır
+├─ Görev Zamanlayıcı: WSL'i ayağa kaldır (hedef: açılışta, oturum açılmadan · yedek: otomatik oturum + anında kilit)
 └─ WSL2 · Ubuntu LTS  = "Hermes cihazı"
    ├─ /etc/wsl.conf: systemd=true · Windows diskleri otomatik bağlanmaz · Windows programı çalıştırma (interop) kapalı
    ├─ kullanıcılar: hermes (servisler + işçiler) · bakimci (sudo)
@@ -912,14 +941,14 @@ Windows 11 (babanın bilgisayarı)
    │   └─ paylasim/             babayla paylaşılan TEK klasör (Windows'tan açıkça bağlanır: gelen/ giden/)
    ├─ systemd: hermes-gateway (dispatcher + cron içinde) · hermes-panel · model-kapisi (Faz 3)
    │           · zamanlayıcılar: yedek · bütünlük kontrolü · ölü-adam sinyali · günlük özet
-   └─ Docker (Faz 5): işçi kod konteynerleri
+   └─ Docker Engine (Faz 1): `isci`nin terminal/kod ortamı (yalnızca kartın çalışma alanı bağlı)
 ```
 
 **Neden WSL2, yerel Windows değil?** Hermes'in yerel Windows kurulumu da birinci sınıf destekli ve daha az katmanlı. Ama belirleyici ölçüt **babanın kişisel verisinin izolasyonu**: kabuk erişimi olan otonom bir ajanın, babanın belgelerine, tarayıcı oturumlarına, e-postasına erişebilen bir kullanıcıyla çalışması kabul edilemez bir hasar yarıçapı. WSL2'de bu sınır *yapılandırmayla* kurulur (otomatik disk bağlama kapalı, interop kapalı, tek paylaşım klasörü) — kalıp eşleştiren onaylara güvenmek gerekmez. Ek olarak: systemd ile düzgün servisler, Hermes ekosisteminin Linux-öncelikli olması, tüm ortamın tek dosya olarak dışa aktarılıp yeniden kurulabilmesi.
 
-**Önemli Hermes gerçeği:** Yerel Windows'ta gateway, *kullanıcı oturum açınca* başlayan bir zamanlanmış görev olarak kurulur (Windows servisi değil). Babanın hesabıyla bu, Hermes'e babanın tüm yetkilerini verir. Bu yüzden yerel Windows yolu seçilirse **ayrı, standart (yönetici olmayan) bir Windows hesabı zorunlu.**
+**Önemli Hermes gerçekleri:** (1) Yerel Windows'ta gateway, *kullanıcı oturum açınca* başlayan bir zamanlanmış görev olarak kurulur; Windows servisi yok ve dokümanlar bunu bilerek önermiyor. Babanın hesabıyla bu, Hermes'e babanın tüm yetkilerini verir; ayrı bir hesapla ise gateway ancak o hesap oturum açınca çalışır — baba kendi hesabını her gün kullanırken bu yürümez. (2) Hermes'in kendi WSL rehberi de WSL'i *oturum açılışında* Görev Zamanlayıcı ile ayağa kaldırmayı öneriyor (WSL sanal makinesi yalnızca bir süreç onu kullandıkça açık kalır). WSL2 yolunda sanal makine babanın Windows hesabı altında çalışsa bile Linux tarafı Windows dosyalarına erişemez (otomatik bağlama ve interop kapalı); izolasyon bu yüzden korunur.
 
-**Geri dönüş koşulu:** Faz 0'daki "fişi çek-tak" testi (kimse oturum açmadan 3 dakika içinde Telegram'dan cevap) WSL2'de güvenilir biçimde geçmezse, yerel Windows + ayrı standart hesap + "başlangıçta, oturum açılmasa da" zamanlanmış görev + Docker terminal backend'ine geçilir. Mimarinin geri kalanı değişmez.
+**Başlatma kararı ve yedeği:** Faz 0'da önce *oturum açılmadan* açılışta başlatma denenir (Görev Zamanlayıcı "başlangıçta"). Güvenilir değilse Hermes'in belgelediği yol kullanılır: **babanın hesabına otomatik oturum açma + oturum açılır açılmaz ekran kilidi + oturum açılışında WSL'i başlatan görev.** Yerel Windows kurulumu yedek değil, reddedilen alternatiftir: izolasyon için ayrı hesap gerektiriyor ve o hesabın oturumu açık olmadan gateway çalışmıyor.
 ---
 
 ## 16. Gözlemlenebilirlik (minimum ama yeterli)
@@ -965,6 +994,8 @@ Windows 11 (babanın bilgisayarı)
 | Provider kesintisi / 429 / zaman aşımı | Kapı sayaçları | Bekle / başka provider / devre kesici; tükenirse `blocked(transient)` | Hayır |
 | Tüm provider'lar erişilemez / ağ yok | Sağlık | Yalnızca-yerel mod; kuyruk; sahibe açık bilgi | Hayır |
 | İşçi oturumu bozuldu | Heartbeat/TTL | İşçi zaten geçici: sonlandır, kartı geri al, karttan yeniden kur | Hayır |
+| İşçi asılı kaldı (canlı, ilerlemiyor) | Heartbeat yaşı | Stale eşiği 30–45 dk'ya indirilmiş (Hermes varsayılanı 4 saat); süreç sonlandırılır, kart yeniden dağıtılır | Tekrarlarsa |
+| Politika kancası yüklenmedi/bozuldu | Kanarya testi | Kanca `fail_closed` olduğu için hata = engel; kanca hiç yüklenmediyse kanarya yakalar → otonom işler durur | **Evet** |
 | Kısmi tamamlama | Kart `running`'de kaldı | Brief/checkpoint'ten devam; adımlar idempotent | Hayır |
 | Çift yürütme riski | Sahiplik kontrolü | Eski işçinin tamamlaması reddedilir; idempotency anahtarları; dış etkileri insan yapar | Hayır |
 | Halüsinasyon | Kanıt kontrolü, hakem | Kart geri döner; R2+'da insan onayı zaten var | R2+ |
@@ -1001,7 +1032,7 @@ Windows 11 (babanın bilgisayarı)
 - **Yetenek minimizasyonu:** Profil başına araç seti (§8.2). En önemli kural: **babayla konuşan profilde terminal yok; terminali olan profil babayla konuşmaz.**
 - **İşletim sistemi izolasyonu:** WSL yapılandırması, ayrı kullanıcılar, salt-okunur config/politika/eklenti dizinleri, tek paylaşım klasörü (§15.3).
 - **Kod çalıştırma:** Docker konteynerinde; yalnızca çalışma alanı bağlanır; ağ kısıtı sonraki fazda (iron-proxy).
-- **Sırlar:** Sır kaynağında (parola yöneticisi CLI'si ya da root'a ait dosya); alt süreçlere temizlenmiş ortam (Hermes bunu zaten yapıyor); politika middleware'i giden LLM isteklerinde anahtar kalıpları arar → red + alarm; log redaksiyonu; provider başına ayrı anahtar; provider panellerinde mümkünse harcama tavanı; **hiçbir hesapta kayıtlı kart yok**.
+- **Sırlar:** Sır kaynağında (parola yöneticisi CLI'si ya da root'a ait dosya); alt süreçlere temizlenmiş ortam (Hermes bunu zaten yapıyor); politika kancası yorum/ek/tamamlama çağrılarında ve dış istek gövdelerinde sır kalıplarını arar → **engeller** + alarm; `auth.json`, `.env` ve sır dizinleri kancada yasak yol; giden LLM isteklerinde ek olarak middleware ile redaksiyon (ikincil katman); log redaksiyonu; provider başına ayrı anahtar; provider panellerinde mümkünse harcama tavanı; **hiçbir hesapta kayıtlı kart yok**.
 - **Veri sınıflandırma + yetki seviyesi:** §4.5 ve §10. Hassas veri yapısal olarak yalnızca yerel/onaylı provider'a gider.
 - **Onaylar:** Tam içerik + hash + süre + tek kullanım.
 - **Tedarik zinciri:** Hermes sürümü sabitlenir; güncelleme yalnızca bakımcıyla, değişiklik notu okunarak ve anlık görüntü alınarak. Topluluk eklentisi/skill'i incelenmeden kurulmaz; skill hub kurulumları Hermes'in karantina tarayıcısından + bakımcı onayından geçer. Kendi eklentilerimiz git'te ve testli.
@@ -1083,8 +1114,8 @@ Not: Yasak komut listeleri (deny-list) sızdırır; birincil kontrol **yeteneği
 1. İzole zemin: WSL2 yapılandırması, ayrı kullanıcılar, salt-okunur config/politika, tek paylaşım klasörü, cihaz şifreleme
 2. Uzaktan bakım (Tailscale) + ölü-adam anahtarı
 3. Yedek + **test edilmiş** geri yükleme
-4. Anayasa v1 (`policy/` git) + deny-only politika middleware'i + profil araç seti minimizasyonu + gözetimsiz modlarda red
-5. Sabit sürümlü Hermes; gateway izin listesi (baba + sen); Kanban; cron yalnızca kart açar
+4. Anayasa v1 (`policy/` git) + `fail_closed` politika kancası + kanarya testi + salt-okunur config + profil araç seti minimizasyonu + gözetimsiz modlarda red
+5. Sabit sürümlü Hermes; gateway izin listesi (baba + sen); Kanban; cron yalnızca LLM'siz script modunda idempotent kart açar; `isci` terminali Docker'da
 6. Profiller: `karsilama`, `isci`, `denetci`
 7. Kart sözleşmesi (spec şablonu) koda bağlı doğrulamayla
 8. Model ayarı: 2–3 ücretsiz provider + yerel yedek; veri sınıfı kuralı (en basit hali: `sensitive` → yalnızca yerel)
@@ -1095,12 +1126,12 @@ Not: Yasak komut listeleri (deny-list) sızdırır; birincil kontrol **yeteneği
 
 ### 21.2 Çekirdek oturduktan sonra eklenecek
 
-- Model kapısı: kayıt, sağlık, kota, eval güdümlü yönlendirme (Faz 3)
+- Model kapısı: kayıt, sağlık, kota, eval güdümlü yönlendirme (Faz 3 — yalnızca Faz 2'de ölçülen bir sorun varsa)
 - Eval koşucusu + Türkçe altın setler (Faz 3)
 - Brief-katlama eklentisi (Faz 3–4)
-- Bilgi derleyici + context-engine eklentisi + küratör (Faz 4)
-- Planlayıcı, araştırmacı, paralel DAG'ler, konteynerde kod, ağ çıkış kontrolü (Faz 5)
-- JEV gölge denemesi (Faz 5+)
+- Bilgi derleyici + context-engine eklentisi + otomatik küratör (Faz 4 — önce insan kapılı, hacim gerektirince otomatik)
+- Planlayıcı, araştırmacı, paralel DAG'ler, konteyner ağ çıkış kontrolü (Faz 5)
+- JEV gölge denemesi (Faz 5+, yalnızca ölçülmüş bir maliyet sorunu varsa)
 - Hedef/öncelik yığını + haftalık gözden geçirme; etki servisi; hash-zincirli denetim günlüğü (Faz 6)
 - Kapılı öğrenme: playbook terfisi, yönlendirme oto-ayarı (Faz 7)
 
@@ -1140,6 +1171,7 @@ Not: Yasak komut listeleri (deny-list) sızdırır; birincil kontrol **yeteneği
 16. **LiteLLM'i yönlendirme beyni yapmak.** İkinci doğruluk kaynağı (§10.9).
 17. **Prompt'a yazılmış bir anayasa.** Kural kodla ve izinle uygulanır.
 18. **Hermes'in API sunucusunu/webhook'larını dışarı açmak.** Gereksiz saldırı yüzeyi.
+19. **Hermes middleware'ini güvenlik kapısı yapmak.** Hata durumunda işlemi geçirir (fail-open). Kapı, `fail_closed` `pre_tool_call` kancasıdır.
 
 ---
 
@@ -1150,27 +1182,27 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 ### Faz 0 — Zemin ve kararlar
 
 - **Amaç:** Güvenli, geri yüklenebilir, uzaktan bakılabilir, *boş* bir "Hermes cihazı". Otonomi yok.
-- **Bileşenler:** Windows sertleştirme (uyku kapalı, güncelleme etkin saatleri, cihaz şifreleme), Tailscale, WSL2 Ubuntu LTS + `wsl.conf` (systemd açık, otomatik disk bağlama kapalı, interop kapalı), kullanıcılar (`hermes`, `bakimci`), dizin düzeni, "başlangıçta" zamanlanmış görev, restic + harici disk, `policy/` `config/` `knowledge/` git depoları, ölü-adam sinyali, babayla yazılmış charter + ilk 3 kullanım senaryosu, anayasa v1 metni.
+- **Bileşenler:** Windows sertleştirme (uyku kapalı, güncelleme etkin saatleri, cihaz şifreleme), Tailscale, WSL2 Ubuntu LTS + `wsl.conf` (systemd açık, otomatik disk bağlama kapalı, interop kapalı), kullanıcılar (`hermes`, `bakimci`), dizin düzeni, WSL'i başlatan zamanlanmış görev (açılışta ya da otomatik oturum + kilit), restic + harici disk, `policy/` `config/` `knowledge/` git depoları, ölü-adam sinyali, babayla yazılmış charter + ilk 3 kullanım senaryosu, anayasa v1 metni.
 - **Bağımlılık:** §24'teki 10 karar; donanım bilgisi.
-- **Bitti tanımı:** (1) Fişi çek-tak → kimse oturum açmadan 3 dk içinde WSL ve test servisi ayakta; (2) Tailscale üzerinden SSH; (3) örnek bir DB'nin yedeği alınıp geri yüklendi; (4) WSL durdurulunca ölü-adam alarmı geldi; (5) `hermes` kullanıcısı `C:\Users\*`'a erişemiyor.
+- **Bitti tanımı:** (1) Fişi çek-tak → 3 dk içinde WSL ve test servisi ayakta (önce oturum açılmadan denenir; olmazsa otomatik oturum + anında kilit yolu seçilir ve test o yolla geçer); (2) Tailscale üzerinden SSH; (3) örnek bir DB'nin yedeği alınıp geri yüklendi; (4) WSL durdurulunca ölü-adam alarmı geldi; (5) `hermes` kullanıcısı `C:\Users\*`'a erişemiyor.
 - **Testler:** 3 kez yeniden başlatma; `/mnt/c` erişilemez; Windows programı çalıştırılamaz; geri yükleme tatbikatı; ölü-adam testi.
 - **Geri alma:** WSL dağıtımını kaldır → dışa aktarımdan yeniden içe al. Windows tarafında yalnızca belgelenmiş ayarlar değişti.
 - **Otomatikleştirilmeyecek:** Her şey. LLM çağrısı yok.
 
 ### Faz 1 — Hermes çekirdeği (kilitli, bakımcı güdümlü)
 
-- **Amaç:** Sabit sürümlü Hermes; Kanban, cron, profiller, politika middleware'i v1, ücretsiz + yerel modeller. Yalnızca sen kullanıyorsun; baba henüz yok.
-- **Bileşenler:** Hermes kurulumu (WSL); salt-okunur config; profiller `karsilama`/`isci`/`denetci` ve araç setleri; onaylar (gözetimsiz modlarda red); sır kaynağı; model ayarı (2–3 ücretsiz provider, fallback zinciri, yardımcı slotlar mümkün olduğunca yerel, OpenRouter'da `data_collection: deny`); politika middleware'i v1 (kart sözleşmesi, yorum kuralları, yasak yollar, anahtar kalıbı taraması, hassas veri → yalnızca yerel); panolar `aile` ve `sistem`; Tailscale arkasında kimlik doğrulamalı panel; günlük teknik özet (sana); yedeklere Hermes DB'leri dahil.
+- **Amaç:** Sabit sürümlü Hermes; Kanban, cron, profiller, politika kancası v1, ücretsiz + yerel modeller. Yalnızca sen kullanıyorsun; baba henüz yok.
+- **Bileşenler:** Hermes kurulumu (WSL); salt-okunur config; profiller `karsilama`/`isci`/`denetci` ve araç setleri; onaylar (gözetimsiz modlarda red); sır kaynağı; model ayarı (2–3 ücretsiz provider, fallback zinciri, yardımcı slotlar mümkün olduğunca yerel, OpenRouter'da `data_collection: deny`); politika kancası v1 (`pre_tool_call`, `fail_closed`: kart sözleşmesi, yorum kuralları, yasak yollar, sır kalıbı taraması, hassas veri → yalnızca yerel) + kanarya testi; Docker Engine + `isci` terminali konteynerde; asılı işçi eşiği 30–45 dk; panolar `aile` ve `sistem`; Tailscale arkasında kimlik doğrulamalı panel; günlük teknik özet (sana); yedeklere Hermes DB'leri dahil.
 - **Bağımlılık:** Faz 0.
 - **Bitti tanımı:** Babanın senaryolarından 10 gerçek kart: işçi yürütür → denetçi doğrular → sonuç panelde. Görev ortasında işçi `kill -9` → geri alınır, **bir kez** tamamlanır. Görev ortasında yeniden başlatma → devam eder. Politika testleri geçer. Loglarda/eklerde sır yok.
-- **Testler:** Kaos (işçi öldür, gateway öldür, yeniden başlat, geçersiz anahtarla 429 benzet, ağı kes → yerel yedek); politika birim testleri (işçi `policy/`'ye yazmaya çalışır → red; `TÜKETİCİ`'siz kart → red; uzun yorum → red; hassas kart → yetkisiz provider → red); log/ek sır taraması; cron'un aynı dönem için iki kez kart açamaması.
+- **Testler:** Kaos (işçi öldür, gateway öldür, yeniden başlat, geçersiz anahtarla 429 benzet, ağı kes → yerel yedek); politika birim testleri (işçi `policy/`'ye yazmaya çalışır → red; `TÜKETİCİ`'siz kart → red; uzun yorum → red; hassas kart → yetkisiz provider → red); log/ek sır taraması; cron'un aynı dönem için iki kez kart açamaması; kanca script'i bozulunca araç çağrılarının engellenmesi (fail-closed doğrulaması); `config.yaml`'a yazma denemesinin başarısız olup alarm üretmesi.
 - **Geri alma:** Hermes home anlık görüntüsü; sabit sürümü yeniden kur; config `git revert`.
 - **Otomatikleştirilmeyecek:** Cron yalnızca özet, yedek, sağlık. Tekrarlayan ajan işi yok. Onaysız hafıza yazımı yok. Ajanın yazdığı skill aktif değil. Dış etki yok. Baba erişimi yok.
 
 ### Faz 2 — Babayla canlı kullanım
 
 - **Amaç:** Baba ilk 3 senaryosunda Hermes'i mesajlaşma üzerinden kullanıyor; onaylar ve sonuçlar akıyor; babaya günlük özet.
-- **Bileşenler:** Seçilen kanalda gateway (izin listesi); `karsilama` (hızlı yol, kart açma, babanın teyidiyle `USER.md`); dosyaların sohbete teslimi; babanın DUR komutu; paylaşım klasörü (`gelen/`, `giden/`); `denetci` için Türkçe inceleme skill'i; 👍/👎 geri bildirimi; `karsilama` oturumunun günlük döndürülmesi.
+- **Bileşenler:** Seçilen kanalda gateway (izin listesi); `karsilama` (hızlı yol, kart açma, babanın teyidiyle `USER.md`); dosyaların sohbete teslimi; babanın DUR komutu; paylaşım klasörü (`gelen/`, `giden/`); `denetci` için Türkçe inceleme skill'i; 👍/👎 geri bildirimi; `karsilama` oturumunun günlük döndürülmesi; haftalık gözden geçirme (öncelikler + `kurator`'un hazırladığı bilgi değişiklik önerisi, sen uygularsın).
 - **Bağımlılık:** Faz 1 en az 1 hafta sorunsuz.
 - **Bitti tanımı:** 2 hafta gerçek kullanım; isteklerin ≥ %80'i hızlı yoldan ya da tamamlanan kartla karşılandı; onaysız dış etki = 0; baba özeti okuyup ne dediğini anlatabiliyor; senin müdahalen haftada < 1 saat.
 - **Testler:** Türkçe senaryolu konuşma testleri (ayrıştırma doğruluğu); onay akışı (onayla/reddet/süresi dolsun); babayla DUR tatbikatı; oturum döndürme (karşılama context'i küçük kalıyor); kesinti tatbikatı (provider'lar kapalı → "sınırlı mod" mesajı).
@@ -1181,7 +1213,7 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 
 - **Amaç:** Ölçülmüş yeteneğe ve kotaya göre yönlendirme; anahtarlar yalnızca kapıda.
 - **Bileşenler:** `model-kapisi` servisi (OpenAI-uyumlu; `core.db`'de kayıt; token kovaları; devre kesiciler; clearance filtresi; çağrı günlüğü); **tüm** profiller ve 11 yardımcı slot → `provider: custom`; bu profillerde Hermes fallback/kimlik havuzları kapalı; eval koşucusu + Türkçe altın setler; haftalık model karnesi; kota görünümü; brief-katlama eklentisi.
-- **Bağımlılık:** Faz 2'nin gerçek trafiği (altın setler buradan).
+- **Bağımlılık / tetik:** Faz 2'nin gerçek trafiği (altın setler buradan). **Kanıt kapılı:** Model kapısı yalnızca Faz 2'de ölçülen bir sorun varsa kurulur — tekrarlayan 429 fırtınaları, sessiz kalite düşüşü ya da hassas veri yönlendirmesinin yerel Hermes ayarıyla sağlanamaması. Sorun yoksa yerel ayar + haftalık elle model gözden geçirmesi sürer; eval koşucusu yine de küçük haliyle (3 rol × 20 Türkçe örnek) kurulur.
 - **Bitti tanımı:** Tüm LLM çağrıları kapı günlüğünde; tatbikatlarda failover çalışıyor; roller eval sonuçlarıyla atanmış; Hermes ortamında provider anahtarı yok; kota bitince kart `blocked(transient)` ve sıfırlanınca kendiliğinden açılıyor.
 - **Testler:** Sahte provider düzeneği (429/500/zaman aşımı/bozuk JSON döndürür) → yeniden deneme/failover/devre kesici; clearance testleri (hassas → yalnızca yerel); "slot sızıntısı" testi (Hermes'ten doğrudan provider'a giden çağrı yok); eval tekrarlanabilirliği.
 - **Geri alma:** Profilleri git'te duran Faz 2 ayarına döndür.
@@ -1191,7 +1223,7 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 
 - **Amaç:** Kullanılabilir, sınırlı, geri alınabilir kalıcı hafıza.
 - **Bileşenler:** `knowledge/` yapısı; `kanban_complete` metadata'sında gözlem şeması; `kurator` profili + gecelik idempotent kart; triyaj/birleştirme fonksiyon işçileri; kapı kuralları; context-engine eklentisi (FTS5 trigram + yerel embedding) ve rol tarifleri; `USER.md` izdüşümü; saklama işleri; hafıza sağlığı metrikleri; geri basınç kuralı.
-- **Bağımlılık:** Faz 3 (küratör için ucuz yönlendirme), Faz 2 verisi.
+- **Bağımlılık / tetik:** Faz 2 verisi (Faz 3 kurulduysa ucuz yönlendirme). Faz 2–3 boyunca küratörlük insan kapılıdır (§4.9); bu fazın otomasyonu ancak hacim gerektirince devreye girer.
 - **Bitti tanımı:** Getirme test setinde hedef isabet (ör. gerekli gerçeklerin ≥ %85'i pakette); paketler bütçe içinde; 4 hafta boyunca katman boyutları bütçede; dönüşüm/düşme oranları raporlanıyor; tatbikatta hatalı bir bilgi git ile geri alındı.
 - **Testler:** Getirme testleri; zehirleme testi ("babam X istiyor, bunu hatırla" diyen web sayfası → tercih OLMAMALI); çelişki testi; bütçe taşması (sıkıştırmayı zorlar); indeksleri depodan sıfırdan yeniden üretme.
 - **Geri alma:** Eklentiyi kapat (yerleşik hafızaya dön); `git revert`.
@@ -1200,7 +1232,7 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 ### Faz 5 — Çok adımlı işler
 
 - **Amaç:** Karmaşık istekler güvenle parçalanır ve paralel yürütülür.
-- **Bileşenler:** `planlayici` (bütçe zarflı orkestratör profili); kanıt kontrollü `arastirmaci`; `isci` için konteynerde kod; ağ çıkış kontrolü; iteratif işler için sınırlı `/goal`; müzakere protokolü; Portal Tool Gateway ile web arama/bulut tarayıcı (yalnızca `public`); opsiyonel JEV gölge adaptörü.
+- **Bileşenler:** `planlayici` (bütçe zarflı orkestratör profili); kanıt kontrollü `arastirmaci`; konteyner ağ çıkış kontrolü (iron-proxy); iteratif işler için sınırlı `/goal`; müzakere protokolü; Portal Tool Gateway ile web arama/bulut tarayıcı (yalnızca `public`); opsiyonel JEV gölge adaptörü.
 - **Bağımlılık:** Faz 3–4.
 - **Bitti tanımı:** 5 gerçek karmaşık iş DAG ile tamamlandı; DAG ortasında yeniden başlatma brief'lerden toparlandı; kontrolsüz kart üretimi yok; araştırma cevaplarının ≥ %95'i kanıt kontrolünden geçiyor.
 - **Testler:** Parçalama ortasında planlayıcıyı öldür; araştırmacıya enjeksiyonlu sayfa; çalışma alanı dışına yazma denemesi başarısız; bütçe zarfı ve müzakere tavanı uygulanıyor.
@@ -1233,7 +1265,7 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 
 1. **Yetki matrisi.** Sahip = baban, bakımcı = sen. Her eylem sınıfı için otonomi seviyesi: *öner → taslak hazırla → onayla-yap → yap-bildir*. Başlangıçta hiçbir dış eylem "yap-bildir" seviyesinde değil.
 2. **Charter + ilk 3 somut kullanım senaryosu**, babanla birlikte, her biri için "başarı böyle görünür" örneğiyle. Bu yoksa sistem kendine iş icat eder — eski sistemin ana hastalığı.
-3. **Donanım ve zemin.** CPU/RAM/GPU (VRAM)/disk; WSL2 "Hermes cihazı"; 7/24 açık kalma (uyku kapalı), Windows Update etkin saatleri, mümkünse küçük bir UPS. Yerel model katmanının gücü buradan çıkar.
+3. **Donanım ve zemin.** CPU/RAM/GPU (VRAM)/disk; WSL2 "Hermes cihazı" ve açılışta başlatma yolu (oturumsuz ya da otomatik oturum + anında kilit); 7/24 açık kalma (uyku kapalı), Windows Update etkin saatleri, mümkünse küçük bir UPS. Yerel model katmanının gücü buradan çıkar.
 4. **Kanal.** Telegram mı WhatsApp mı (babanın zaten kullandığı); sesli mesaj/sesli cevap gerekiyor mu; onay butonlarının dili.
 5. **Veri sınıfları ve provider yetkileri.** Babanın hangi verisi hassas; hangi provider neyi görebilir. Verisini eğitimde kullanan ücretsiz katmanlar yalnızca `public`.
 6. **Para politikası.** Harcama 0; hiçbir hesapta kart yok. İstisnalar yalnızca senin kararın: Nous Portal aboneliği (varsa, sabit tutar) ve OpenRouter'a bir kerelik ~10$ (ücretsiz modellerde günlük limiti ~50'den ~1000 isteğe çıkarır; kurulumda resmi sayfadan doğrulanmalı).
@@ -1259,13 +1291,14 @@ Sıralama mantığı: **Önce geri alınabilirlik ve gözlem, sonra insan güdü
 
 | Madde | Neden önemli | Doğrulanamazsa |
 |---|---|---|
-| WSL2'nin oturum açılmadan başlaması ve boşta kapanmaması | Tüm sürekliliğin temeli | Yerel Windows + ayrı hesap yoluna geç (§15.3) |
-| Hermes'in salt-okunur `config.yaml`/eklenti dizinine tahammülü | Ajanın kendi kurallarını değiştirememesi | Config'i ayrı kullanıcıya ait bir dizine taşıyıp ortam değişkeniyle göster; olmazsa dosya bütünlüğü izleme + alarm |
-| Middleware'in `kanban_*` araç çağrılarını görüp `kanban_show` çıktısını kısaltabilmesi | Brief-katlama | Yorum disiplini + kart başına yorum tavanı + uzun kartları yeni karta bölme |
+| WSL2'nin oturum açılmadan başlaması ve boşta kapanmaması | Tüm sürekliliğin temeli | Hermes'in belgelediği yol: babanın hesabına otomatik oturum + anında ekran kilidi + oturum açılışında WSL (§15.3) |
+| Hermes'in salt-okunur `config.yaml`/eklenti dizinine tahammülü (karar: salt-okunur) | Ajanın kendi kurallarını değiştirememesi | Yazılabilir config + dakikalık bütünlük kontrolü (git farkı → geri yükle + alarm) |
+| Bir dönüştürme kancasının/middleware'in `kanban_show` çıktısını kısaltabilmesi | Brief-katlama | Yorum disiplini + kart başına yorum tavanı + uzun kartları yeni karta bölme |
 | Karşılama oturumunu döndürme/sıkıştırma ayarları | Sohbet context'inin şişmemesi | Günlük zamanlanmış `/new` benzeri sıfırlama |
 | Eşzamanlı işçi sayısı ayarı | Ücretsiz kotada 429 fırtınası | Kart sayısını dispatcher yerine öncelik bantlarıyla sınırla |
-| Cron işinin idempotency anahtarıyla kart açabilmesi | Tekrarlayan işin tam-bir-kez olması | CLI'den `--idempotency-key` ile kart açan bir systemd zamanlayıcısı |
+| Cron'un LLM'siz script modundan `hermes kanban create --idempotency-key` çağrısı (script modu doğrulandı; kart açma kurulumda test edilecek) | Tekrarlayan işin tam-bir-kez olması | Aynı script'i çağıran bir systemd zamanlayıcısı |
 | Nous Portal veri politikası, plan kotaları, API anahtarı ile erişim | Portal'ın yetki seviyesi ve yeri | `public` seviyesinde kalır; yalnızca `danisman` profilinde doğrudan |
 | Ücretsiz katman rakamları (OpenRouter 50/1000, Groq, Gemini'nin eğitimde kullanması) | Kapasite planı | Resmi sayfalardan yeniden doğrula (bu araştırmada bazı rakamlar ikincil kaynaklıydı) |
 | GitHub Models'ın kapanması, Cerebras'ın kartsız katmanı kaldırması | Provider listesi | İkincil kaynak; kurulumda kontrol |
-| "İlerleme yok" dedektörü | Döngüde takılan işçi | Middleware ile ekle |
+| "İlerleme yok" dedektörü | Döngüde takılan işçi | Kanca ile ekle (+ düşürülmüş stale eşiği) |
+| Docker backend'inde dosya araçlarının konteynerde mi host'ta mı çalıştığı | İşçinin host'taki Hermes dosyalarına erişimi | Host'taysa: `isci`de yazma yalnızca çalışma alanına (kancada yol kontrolü); hassas yollar zaten yasak |
