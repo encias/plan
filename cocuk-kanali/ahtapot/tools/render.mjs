@@ -3,6 +3,8 @@
 import { chromium } from 'playwright';
 import { spawn, execFileSync } from 'child_process';
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
+// Chromium: CHROME_PATH ortam değişkeni > bulut ortamındaki kurulu Chromium > Playwright varsayılanı
+const CHROME = process.env.CHROME_PATH || (fs.existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' : undefined);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (k, d) => { const a = process.argv.find(x => x.startsWith(`--${k}=`)); return a ? a.split('=')[1] : d; };
 const FPS = 30, from = +arg('from', 0), to = +arg('to', 180), workers = +arg('workers', 4);
@@ -10,7 +12,7 @@ const out = path.resolve(root, arg('out', 'out/video_sessiz.mp4'));
 const FF = execFileSync('python3', ['-c', 'import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())']).toString().trim();
 const f0 = Math.round(from * FPS), f1 = Math.round(to * FPS), per = Math.ceil((f1 - f0) / workers);
 const tmp = path.join(root, 'out'); fs.mkdirSync(tmp, { recursive: true });
-const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--allow-file-access-from-files'] });
+const browser = await chromium.launch({ executablePath: CHROME, args: ['--allow-file-access-from-files'] });
 const t0 = Date.now(); let done = 0;
 async function work(k) {
   const a = f0 + k * per, b = Math.min(f1, a + per); if (a >= b) return null;

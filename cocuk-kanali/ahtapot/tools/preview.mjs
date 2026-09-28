@@ -2,12 +2,14 @@
 // Varsayılan 960x540 PNG (token tasarrufu). --full → 1920x1080. --page=dev.html farklı sayfa.
 import { chromium } from 'playwright';
 import path from 'path'; import fs from 'fs'; import { fileURLToPath } from 'url';
+// Chromium: CHROME_PATH ortam değişkeni > bulut ortamındaki kurulu Chromium > Playwright varsayılanı
+const CHROME = process.env.CHROME_PATH || (fs.existsSync('/opt/pw-browsers/chromium-1194/chrome-linux/chrome') ? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' : undefined);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2), full = args.includes('--full');
 const pageArg = (args.find(a => a.startsWith('--page=')) || '--page=index.html').slice(7);
 const [out, ...times] = args.filter(a => !a.startsWith('--'));
 fs.mkdirSync(out, { recursive: true });
-const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args: ['--allow-file-access-from-files'] });
+const b = await chromium.launch({ executablePath: CHROME, args: ['--allow-file-access-from-files'] });
 const p = await b.newPage({ viewport: { width: 1920, height: 1080 } });
 const errs = []; p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); }); p.on('pageerror', e => errs.push(String(e)));
 await p.goto('file://' + path.join(root, pageArg)); await p.evaluate(() => window.ready);
