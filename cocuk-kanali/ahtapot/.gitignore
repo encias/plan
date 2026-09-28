@@ -3,3 +3,4 @@ out/frames
 out/seg*
 *.wav
 out/cues.json
+out/video_sessiz.mp4
