@@ -259,6 +259,7 @@ def main():
             x = SFX[name](); cache[name] = x / (np.max(np.abs(x)) + 1e-9)
         g = .32 * c.get('vol', 1)
         place(sfx[0], cache[name], c['t'], g); place(sfx[1], cache[name], c['t'], g)
+    sfx *= .65 + .35 * (duck - .42) / .58  # konuşma anlarında efektler de %35 kısılır
     mix = music + sfx
     tt2 = np.arange(N) / SR
     mix *= np.interp(tt2, [0, .05, 179.2, 180], [0, 1, 1, 0])

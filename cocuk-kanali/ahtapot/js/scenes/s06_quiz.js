@@ -352,7 +352,7 @@ registerScene({
     const glow = .75 + .25 * Math.sin(lt * 4);
     if (wallOn) { ctx.save(); ctx.translate(wOff, 0); s06_wall(ctx); s06_holeBack(ctx, glow * (lt < 14.4 ? 1 : .5)); ctx.restore(); }
 
-    if (O.s > 0) {
+    if (O.s > .01) {
       if (O.upright) softShadow(ctx, O.x, lt < 3.7 ? 1030 : 1000, 210 * O.s, 30, .22);
       ctx.save();
       if (wallOn && lt > 13.9 && lt < 15.6) {
@@ -377,7 +377,7 @@ registerScene({
 
     // delik ↔ göz karşılaştırması
     const cmpA = win(lt, 5.2, 7.9, .2, .35);
-    if (cmpA > 0 && O.s > 0) {
+    if (cmpA > 0 && O.s > .01) {
       const [ex, ey] = okiPoint('eyeR', O.x, O.y, O.s, O.o), H6 = S06_HOLE;
       const r1 = pop(lt, 5.3, .4), r2 = pop(lt, 5.6, .4), lp = ease.out(prog(lt, 5.85, 6.3));
       ctx.save(); ctx.globalAlpha *= cmpA; ctx.lineCap = 'round';
@@ -435,7 +435,7 @@ registerScene({
 
     // gaga: büyüteç + papağan
     const magS = pop(lt, 18.9, .5) * (1 - ease.inBack(prog(lt, 21.9, 22.3)));
-    if (magS > 0 && O.s > 0) {
+    if (magS > .01 && O.s > .01) {
       const [bx, by] = okiPoint('beak', O.x - cam, O.y, O.s, O.o), mx = 1000, my = 470, R = 170 * magS;
       const an = Math.atan2(my - by, mx - bx), px = -Math.sin(an) * R * .92, py = Math.cos(an) * R * .92;
       ctx.fillStyle = 'rgba(233,252,255,0.2)'; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(mx + px, my + py); ctx.lineTo(mx - px, my - py); ctx.closePath(); ctx.fill();

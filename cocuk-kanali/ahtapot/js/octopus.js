@@ -9,7 +9,7 @@
 //    xray: 0..1  (içini gösterir: 3 kalp, solungaçlar, mavi kan akışı)
 //    hearts: {bpm:72, mainStop:0..1, flow:1}
 //    neuro: 0..1 (kollarda sinir düğümleri + beyin parlar)
-//    bumps: 0..1 (deri tümsekleri), mottle: {color, amount} (kamuflaj lekeleri)
+//    blush: 0..1 (yanak pembesi, varsayılan 1)  bumps: 0..1 (deri tümsekleri), mottle: {color, amount} (kamuflaj lekeleri)
 //    waveArm: 0..1 (sağ dış kol el sallar), reach: {arm, x, y, p} (kol yerel hedefe uzanır; x,y yerel birim)
 //  Dünya koordinatı almak için: okiPoint('mainHeart', x, y, s, o) / okiArmPoint(i, 0..1, x, y, s, o, t)
 // ============================================================
@@ -199,7 +199,7 @@ function drawFace(ctx, o, t, col, line) {
   const blink = o.blink ?? autoBlink(t, o.seed || 0);
   const es = eye === 'surprised' ? 1.14 : 1;
   // yanaklar
-  ctx.fillStyle = rgba(PAL.blush, .42);
+  ctx.fillStyle = rgba(PAL.blush, .42 * (o.blush ?? 1));
   [-72, 72].forEach(cx => { ctx.beginPath(); ctx.ellipse(cx, -36, 17, 10, 0, 0, TAU); ctx.fill(); });
   [-42, 42].forEach(ex => {
     const ey = -72;

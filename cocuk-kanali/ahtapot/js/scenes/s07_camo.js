@@ -181,7 +181,7 @@ function s07_hideOki(lt) {
   const rev = ease.inOut(prog(lt, 19.85, 20.45));
   const hideP = { spread: 1.3, curl: .7, waveAmp: .06, waveSpeed: .3, lift: 0, len: .95, walk: 0, pulse: 0 };
   const o = { seed: 7, pose: rev > 0 ? blendPose(hideP, 'idle', rev) : hideP, color: mix(PAL.rock, PAL.octo, rev), bumps: 1 - rev,
-    mottle: { color: PAL.rock2, amount: .75 * (1 - rev), seed: 9 }, eye: 'closed', mouth: 'flat', look: { x: 0, y: .3 } };
+    mottle: { color: PAL.rock2, amount: .75 * (1 - rev), seed: 9 }, eye: 'closed', mouth: 'flat', look: { x: 0, y: .3 }, blush: rev };
   let y = 705;
   if (lt >= 19.8) {
     o.eye = lt < 20.5 ? 'surprised' : 'happy'; o.mouth = lt < 20.5 ? 'o' : 'grin'; o.brow = lt < 20.5 ? 'raised' : null;
@@ -203,7 +203,7 @@ function s07_lensPos(lt) {
   return [1330, 625];
 }
 function s07_lens(ctx, lt, t, O, sc) {
-  if (sc <= 0) return;
+  if (sc < .02) return;
   const [mx, my] = s07_lensPos(lt), R = 95 * sc, z = 1.45;
   ctx.save(); ctx.translate(mx, my); ctx.rotate(.1 * Math.sin(lt * 2));
   ctx.save(); ctx.rotate(.75); ctx.fillStyle = 'rgba(5,20,40,0.3)'; rrect(ctx, R + 4, -18 + 8, 130 * sc, 36, 18); ctx.fill();
@@ -269,7 +269,7 @@ registerScene({
       const zp = ease.inOut(prog(lt, 20.6, 22.3)), z = 1 + .42 * zp;
       const rise = 1100 * (1 - ease.out(prog(lt, 14.6, 15.35)));
       ctx.save();
-      ctx.translate(lerp(hx, 960, zp), lerp(hy, 610, zp)); ctx.scale(z, z); ctx.translate(-hx, -hy);
+      ctx.translate(lerp(hx, 1120, zp), lerp(hy, 610, zp)); ctx.scale(z, z); ctx.translate(-hx, -hy);
       if (lt >= 15.4) drawOcean(ctx, t, { depth: .28 });
       ctx.save(); ctx.translate(0, rise); s07_reef(ctx, lt, t, O); ctx.restore();
       // ipucu kabarcıkları
