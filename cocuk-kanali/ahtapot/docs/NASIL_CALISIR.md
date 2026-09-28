@@ -6,10 +6,11 @@ Video bir AI video modeliyle üretilmedi. Her kare **kodla çiziliyor**: tarayı
 
 ```
 1. Konu + bilimsel doğrulama
-2. Seslendirme metni, zaman kodlu        → js/core.js  VO dizisi
+2. Seslendirme metni, zaman kodlu        → js/bolum.js  (bölüme özel tüm veri: süre, sahne aralıkları, VO, müzik)
 3. Storyboard, sahne başına              → docs/STORYBOARD.md
 4. Sahne kodu                            → js/scenes/sXX_*.js   (sahne sözleşmesi: docs/SAHNE_BRIFI.md)
 5. Görsel kalite kontrolü (temas föyü)   → tools/preview.mjs + tools/sheet.py
+5b. Denetim                              → tools/dogrula.py + tools/tara.mjs
 6. Görüntü render                        → tools/render.mjs    → out/video_sessiz.mp4 + out/cues.json
 7. Müzik + efekt                         → tools/audio.py      → out/muzik_sfx.wav (VO'ya göre ducking)
 8. Altyazı                               → tools/srt.py        → out/ahtapot_tr.srt
@@ -20,7 +21,8 @@ Video bir AI video modeliyle üretilmedi. Her kare **kodla çiziliyor**: tarayı
 
 | Dosya | Satır | Ne yapar | Kim yazdı |
 |---|---|---|---|
-| `js/core.js` | 343 | Palet, zaman çizelgesi (`T`), seslendirme (`VO`), SFX listesi, easing, yazı, rozet, okyanus arka planı, kabarcık geçişi, ilerleme göstergesi | Ana oturum |
+| `js/bolum.js` | — | Bölüm verisi: `DURATION`, `T`, `VO`, `FACTS`, `MUSIC`, `SAHNELER` | Ana oturum |
+| `js/core.js` | ~330 | Palet, SFX listesi, easing, yazı, rozet, okyanus arka planı, kabarcık geçişi, ilerleme göstergesi | Ana oturum |
 | `js/octopus.js` | 339 | Oki karakteri: 8 kol (omurga eğrisi + dalga), yüz ifadeleri, röntgen (3 kalp + kan akışı), nöron parıltısı, kamuflaj, pozlar | Ana oturum |
 | `js/main.js` | 31 | Sahne yöneticisi: `renderFrame(t)`, geçişler, cue toplama | Ana oturum |
 | `js/scenes/s01, s02, s10` | 62/56/122 | Kanca, başlık, kapanış (stil referansı) | Ana oturum |
@@ -28,6 +30,7 @@ Video bir AI video modeliyle üretilmedi. Her kare **kodla çiziliyor**: tarayı
 | `js/scenes/s06–s09` | 230–514 | Soru, kamuflaj, mürekkep, zekâ | Alt ajan B |
 | `tools/render.mjs` | 40 | 4 paralel Chromium sekmesi → JPEG → x264 (CRF 18) | Ana oturum |
 | `tools/audio.py` | 276 | Marimba/bas/ped/davul sentezi, 18 efekt, VO ducking, limitleme | Ana oturum |
+| `tools/dogrula.py`, `tools/tara.mjs` | — | Render öncesi denetim: zaman çizelgesi, VO hızı, efektler, kod kuralları; tüm bölüm hata/boş kare taraması | Ana oturum |
 | `karakter.html` | — | Karakter sayfası: Oki'nin tüm pozları tek ekranda | Ana oturum |
 | `thumbnail.html` | — | Küçük resim kompozisyonu | Ana oturum |
 

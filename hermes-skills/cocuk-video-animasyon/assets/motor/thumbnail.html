@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Ahtapot — animasyon</title>
+<style>
+@font-face{font-family:'Baloo 2';font-weight:600;src:url(fonts/baloo-2-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Baloo 2';font-weight:600;src:url(fonts/baloo-2-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo-2-latin-800-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo-2-latin-ext-800-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+html,body{margin:0;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:auto}
+</style>
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="js/core.js"></script><script src="js/octopus.js"></script>
+<script>
+// YouTube küçük resmi (1280x720'ye küçültülür). Kural: tek duygu, tek fikir, ≤3 kelime, telefonda okunur.
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+window.renderFrame = function (t) {
+  drawOcean(ctx, 3.2, { depth: .05, floorY: 1000, bubbles: false });
+  ctx.save(); ctx.translate(1330, 560);
+  for (let i = 0; i < 18; i++) { ctx.rotate(TAU / 18); ctx.fillStyle = 'rgba(255,250,210,0.16)'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-110, -1500); ctx.lineTo(110, -1500); ctx.closePath(); ctx.fill(); }
+  ctx.restore();
+  const g = ctx.createRadialGradient(1330, 560, 100, 1330, 560, 700); g.addColorStop(0, 'rgba(255,255,230,0.35)'); g.addColorStop(1, 'rgba(255,255,230,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const o = { pose: 'cheer', xray: 1, hearts: { bpm: 72, highlight: 'main' }, eye: 'surprised', mouth: 'open', look: { x: -.6, y: -.2 }, seed: 9 };
+  drawOki(ctx, 1340, 900, 2.75, o, .9);
+  // sol blok
+  ctx.save(); ctx.translate(560, 0);
+  for (let i = 0; i < 3; i++) { ctx.save(); ctx.translate(-190 + i * 190, 250); ctx.rotate((i - 1) * .12); heartPath(ctx, 0, 10, 78); ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fill(); heartPath(ctx, 0, 0, 78); ctx.fillStyle = PAL.heart; ctx.fill(); ctx.lineWidth = 12; ctx.strokeStyle = '#fff'; ctx.stroke(); ctx.restore(); }
+  txt(ctx, '3 KALP', 0, 560, { size: 300, fill: PAL.yellow, sw: 46, rot: -.04 });
+  txt(ctx, 'VAR!', 0, 820, { size: 250, fill: PAL.white, sw: 42, rot: -.04 });
+  ctx.restore();
+  // ok
+  ctx.save(); ctx.translate(1020, 330); ctx.rotate(.25);
+  ctx.fillStyle = PAL.heart; ctx.strokeStyle = PAL.white; ctx.lineWidth = 12; ctx.lineJoin = 'round';
+  ctx.beginPath(); ctx.moveTo(-120, -28); ctx.lineTo(40, -28); ctx.lineTo(40, -70); ctx.lineTo(130, 0); ctx.lineTo(40, 70); ctx.lineTo(40, 28); ctx.lineTo(-120, 28); ctx.closePath(); ctx.stroke(); ctx.fill();
+  ctx.restore();
+};
+window.ready = document.fonts.ready.then(() => Promise.all([...document.fonts].map(f => f.load().catch(() => {}))));
+</script></body></html>
