@@ -1,0 +1,1450 @@
+OKİ'NİN DENİZ KAŞİFLERİ — KOD PAKETİ (ÖZ)
+Bu dosya, "Ahtapotun 3 Kalbi Var!" bölümünü üreten sistemin metin hâlidir. Görsel karşılığı: Oki_Izleme_Kitabi.pdf
+Okuma sırası: YÖNTEM → MOTOR API → BÖLÜM 1 VERİSİ → BÖLÜM 1 SAHNELERİ → (varsa) MOTOR KAYNAĞI / ARAÇLAR.
+Her dosya "### DOSYA: <yol>" satırıyla başlar. Motor dosyaları (js/core.js, js/octopus.js, js/main.js, tools/audio.py) DEĞİŞTİRİLMEZ.
+Yaklaşık boyut: 91,521 karakter ≈ 28k token
+
+İÇİNDEKİLER
+  skills/cocuk-video-senaryo/SKILL.md (72 satır)
+  skills/cocuk-video-senaryo/references/format.md (38 satır)
+  skills/cocuk-video-animasyon/SKILL.md (79 satır)
+  skills/cocuk-video-animasyon/references/sahne-sozlesmesi.md (43 satır)
+  skills/cocuk-video-animasyon/references/kalite-kontrol.md (31 satır)
+  skills/cocuk-video-animasyon/references/motor-api.md (96 satır)
+  js/bolum.js (65 satır)
+  docs/STORYBOARD.md (33 satır)
+  skills/cocuk-video-senaryo/assets/bolum_sablonu.js (33 satır)
+  js/scenes/s01_hook.js (63 satır)
+  js/scenes/s02_title.js (57 satır)
+  js/scenes/s03_hearts.js (255 satır)
+  js/scenes/s10_outro.js (123 satır)
+  js/octopus.js (340 satır)
+  karakter.html (31 satır)
+
+================================================================================
+=== BÖLÜM: YÖNTEM (skill belgeleri)
+================================================================================
+
+################################################################################
+### DOSYA: skills/cocuk-video-senaryo/SKILL.md   (72 satır)
+################################################################################
+---
+name: cocuk-video-senaryo
+description: Çocuk YouTube kanalı (4–8 yaş, Türkçe) için 3 dakikalık eğitici animasyon bölümünün konusunu seçer, bilgileri kaynakla doğrular, zaman kodlu seslendirme metnini ve sahne sahne storyboard'u yazar; çıktıyı animasyon motorunun okuduğu js/bolum.js formatında verir. "Yeni bölüm", "bölüm konusu", "çocuk videosu senaryosu", "seslendirme metni", "storyboard" isteklerinde kullan. Kod/animasyon yazmaz (o iş cocuk-video-animasyon), YouTube başlık/thumbnail işi yapmaz (o iş cocuk-video-yayin).
+license: Özel kullanım
+metadata:
+  seri: "Oki'nin Deniz Kaşifleri"
+  surum: "1.0"
+  ornek_bolum: "Ahtapotun 3 Kalbi Var! (references/ornek-*)"
+---
+
+# Çocuk Video Senaryosu
+
+Amaç: bir çocuğun 3 dakika boyunca ekrandan kopmadığı, ebeveynin "bunu izlesin" dediği ve bilgileri **doğru** olan bir bölüm planı. Senaryo videonun kalitesinin yarısıdır. Animasyon ne kadar iyi olursa olsun, zayıf bir senaryo "AI slop" olarak algılanır.
+
+## Çıktılar (üçü de zorunlu)
+1. `js/bolum.js` — `assets/bolum_sablonu.js` kalıbıyla: `DURATION`, `T`, `VO`, `FACTS`, `MUSIC`, `SAHNELER`. Animasyon motoru bunu doğrudan okur; format bozulursa hiçbir şey çalışmaz.
+2. `docs/STORYBOARD.md` — sahne başına 2–4 saniyelik vuruşlar (beat): ekranda ne var, Oki ne hissediyor, ekran yazısı (≤3 kelime), efekt sesi.
+3. `docs/KAYNAKLAR.md` — her bilgi için en az 2 güvenilir kaynak (link + tek cümle alıntı/özet).
+
+Tam örnek: `references/ornek-bolum-ahtapot.js` ve `references/ornek-storyboard-ahtapot.md`. **Yeni bölüme başlamadan önce ikisini de oku**. Kalite çıtası odur.
+
+## Adımlar
+
+### 1. Konu seç
+Konu şu 5 şartı sağlamalı; sağlamıyorsa başka konu seç:
+- **7 şaşırtıcı ve doğrulanabilir bilgi** çıkıyor (az çıkıyorsa konu zayıf).
+- Bilgiler **görselleştirilebilir** (kalp, renk, hareket, karşılaştırma). "Soyut istatistik" olanlar değil.
+- Başlıkta aranan bir ifade var ("ahtapot", "yunus", "köpekbalığı"…).
+- Serinin formatına uyuyor (Oki bir deniz kaşifi; konuk hayvan tanıtılır).
+- Önceki bölümün kapanışında söz verilen konuysa **önce o** yapılır (seri güveni).
+
+### 2. Bilgileri doğrula
+- Her bilgi için 2 bağımsız güvenilir kaynak: ansiklopedi, üniversite, akvaryum/müze, hakemli makale. Blog/içerik çiftliği sayılmaz.
+- Kaynaklar çelişiyorsa ya da bilgi "bazı türlerde" geçerliyse metin bunu söyler: "Bazı ahtapotlar…", "Bilim insanları düşünüyor ki…". Kesin olmayanı kesinmiş gibi söyleme.
+- Çocuğu yanıltacak basitleştirme yapma. Basitleştir ama yanlışlama: "sekiz küçük beyin gibi" (metafor) doğru; "sekiz beyni var" yanlış.
+- Kavramı çocuğun dünyasına bağla: "Bizim kanımızda demir var, bu yüzden kırmızı."
+
+### 3. Yapıyı kur
+`references/format.md` içindeki 180 saniyelik iskeleti kullan: kanca → tanıtım → 7 süper güç (biri soru, biri oyun) → özet + sonraki bölüm. İskelet serinin kimliğidir; sadece içerik değişir.
+
+### 4. Seslendirmeyi yaz (VO)
+Kurallar ve **nedenleri**:
+- **Konuşma hızı ortalama 2.3 kelime/sn, en fazla 2.8.** Çocuk anlatıcı yavaş ve net konuşur. Hızlı metin, seslendirmede ya yetişmez ya da çocuk kaçırır. `tools/dogrula.py` 2.8'i aşarsa uyarır, 3.1'i aşarsa reddeder.
+- **Cümle ≤ 12 kelime, her cümlede tek fikir.** 4–8 yaş çalışma belleği kısa.
+- **Satır süresi = kelime / 2.3 + 0.3 sn.** Satırlar arasında en az 0.2 sn nefes.
+- **Bir satır sahne sınırını geçemez.** Sahne başındaki ilk 0.4 sn ve sonundaki son 0.4 sn kabarcık geçişiyle kapalı; o aralığa önemli söz koyma.
+- **Çocukla konuş:** "Sence…?", "Düşünsene…", "Hadi bakalım…". Soru sonrası 1–2 sn boşluk bırak (çocuk cevap versin).
+- **Teknik terim ekrana ve metne girmez** (hemosiyanin, kromatofor). Onun yerine sonucu söyle ("bakır kanı maviye boyar").
+- **Her bilgi sahnesi aynı kalıpla açılır:** "Birinci süper güç: …". Tekrar eden kalıp, çocuğa nerede olduğunu hissettirir.
+- **Kapanış sözlü çağrıyla biter:** "Bir sonraki bölümde: …". "Çocuklara uygun" videoda yorum ve bitiş ekranı kapalıdır; "yorum yaz", "abone ol butonuna bas" işe yaramaz.
+
+### 5. Storyboard'u yaz
+Her sahne için 2–4 sn'lik vuruşlar. Her vuruş şunları söyler: **zaman aralığı**, **ekrandaki ana görsel fikir** (tek bir fikir), **Oki'nin ifadesi**, **ekran yazısı** (≤3 kelime, BÜYÜK HARF), **efekt** (motorun SFX listesinden).
+- Görsel, VO satırının **anlamını** göstermeli; sadece süslememeli. "Bakır kanı maviye boyar" → bakır parçacıkları damlaya girer, damla maviye döner.
+- Her 2–4 sn'de bir değişim: yeni öğe, kamera hareketi, ifade değişimi. 6 sn'den uzun durağan ekran yok.
+- Soyut bilgiyi karşılaştırmayla göster (iskeletli balık ↔ iskeletsiz Oki; çocuk eli ↔ ahtapot kolu).
+
+### 6. bolum.js'i doldur ve kendini denetle
+- `T` aralıkları boşluksuz ve 0'dan `DURATION`'a kesintisiz olmalı. `SAHNELER` dizisindeki adlar `T` anahtarlarıyla aynı sırada (`s03` → `s03_kalpler`).
+- `FACTS` = 7 bilgi sahnesinin `T` aralıkları (ilerleme yıldızları).
+- `MUSIC.quiet` = müziğin susacağı/kısılacağı anlar (geri sayım, saklambaç). `MUSIC.start` = karakterin ortaya çıktığı an (ritim orada başlar).
+- Animasyon ortamı kuruluysa `node tools/cues.mjs && python3 tools/dogrula.py` çalıştır. Kurulu değilse süre/hız hesaplarını elle kontrol et.
+
+## Teslim öncesi kontrol listesi
+- [ ] 7 bilginin her birinin `KAYNAKLAR.md`'de 2 kaynağı var; belirsiz olan yumuşatıldı.
+- [ ] İlk 10 sn'de merak sorusu var (kim/ne/neden?) ve cevap hemen verilmiyor.
+- [ ] En az 1 soru-cevap (geri sayımlı) ve 1 oyun ("… nerede?") anı var.
+- [ ] Hiçbir VO satırı 2.8 kelime/sn'yi aşmıyor; sahne sınırını geçmiyor.
+- [ ] Ekran yazılarının hiçbiri 3 kelimeyi aşmıyor.
+- [ ] Kapanış bir sonraki bölümün sorusunu soruyor.
+- [ ] Metinde "harika", "muhteşem", "inanılmaz" gibi boş sıfatlar yerine somut bilgi var (boş coşku = slop sinyali).
+
+################################################################################
+### DOSYA: skills/cocuk-video-senaryo/references/format.md   (38 satır)
+################################################################################
+# Seri Formatı — "Oki'nin Deniz Kaşifleri" (180 sn iskelet)
+
+Bu iskelet serinin kimliğidir. Çocuk ve ebeveyn her bölümde aynı ritmi tanır; bu tanıdıklık tekrar izlemeyi ve oynatma listesi izlenmesini artırır. Süreler ±2 sn esneyebilir; sıra ve işlevler değişmez.
+
+| # | Sahne | Süre | İşlev | Zorunlu öğe |
+|---|---|---|---|---|
+| S1 | Kanca | 0–10 | Merak | Karanlık/gizemli ortam, siluet, konuk hayvanın 3 en şaşırtıcı özelliği ipucu olarak; "Sence bu kim?" |
+| S2 | Tanıtım | 10–18 | Vaat | Işık patlaması, hayvan ortaya çıkar, başlık, "7 süper gücünü keşfedelim", 7 yıldız ilerleme çubuğuna uçar. Müzik ritmi burada başlar |
+| S3 | Süper güç 1 | ~18–44 | En güçlü bilgi | Başlıktaki bilgi (thumbnail ile aynı). En uzun ve en zengin sahne |
+| S4 | Süper güç 2 | ~44–64 | Bilgi | Karşılaştırma (biz ↔ o) |
+| S5 | Süper güç 3 | ~64–90 | Bilgi | Çocuğun kendi bedeniyle ilişki ("Düşünsene: …") |
+| S6 | Süper güç 4 = SORU | ~90–116 | Etkileşim, orta nokta tutunması | "Sence …?" → EVET/HAYIR → 3-2-1 geri sayım (müzik susar) → cevap + neden |
+| S7 | Süper güç 5 = OYUN | ~116–140 | Etkileşim | "… nerede?" arama oyunu; VO'da 1.5 sn arama boşluğu; "İşte orada!" |
+| S8 | Süper güç 6 | ~140–157 | Aksiyon | Hareketli, hızlı sahne (kaçış, av, yarış) |
+| S9 | Süper güç 7 | ~157–170 | Zekâ/davranış | "Bazı …" ile doğru genelleme |
+| S10 | Özet + sonraki | 170–180 | Tekrar + bağlama | 7 madalya ikonu, "gerçek bir süper kahraman", sonraki bölüm kartı, "Hoşça kal!" |
+
+## Neden bu sıra
+- **İlk 10 sn** izleyicinin kalıp kalmadığına karar verdiği an: cevabı vermeden soru sor.
+- **En güçlü bilgi ilk sırada**: thumbnail'da vaat edilen şey hemen verilmezse çocuk (ve algoritma) güvenini kaybeder.
+- **Ortada soru, sonra oyun**: izlenme eğrisinin düştüğü 1:30–2:20 aralığını etkileşimle doldurur.
+- **Aksiyon sahnesi sona yakın**: enerji düşmeden kapanışa girer.
+- **Kapanışta sonraki bölüm**: seri izlenmesine köprü; bitiş ekranı olmadığı için tek çağrı budur.
+
+## Sabit görsel dil (motor zaten uygular)
+- Sol üstte numaralı yıldız rozeti (`factBadge`) + "SÜPER GÜÇ" başlığı; sağ üstte 7 yıldızlı ilerleme.
+- Sahne geçişleri kabarcık perdesi (S1→S2 ve S2→S3 hariç özel geçişler olabilir).
+- Oki her bölümde aynı karakter; konuk hayvan bölüme özel çizilir.
+
+## Konu havuzu (öneri sırası)
+1. Yunuslar nasıl uyur? (beynin yarısıyla uyuma, tek göz açık) — ahtapot bölümünde söz verildi
+2. Köpekbalığı (dişlerin yenilenmesi, elektrik algılama)
+3. Deniz yıldızı (beyinsiz, kolunu yeniden büyütme, midesini dışarı çıkarma)
+4. Denizatı (babanın doğurması, gözlerin ayrı hareketi)
+5. Mavi balina (en büyük hayvan, kalbinin büyüklüğü, şarkıları)
+6. Kaplumbağa (yuvaya dönüş, sıcaklıkla cinsiyet)
+Her konu için 7 bilgi doğrulanamıyorsa sıradakine geç.
+
+################################################################################
+### DOSYA: skills/cocuk-video-animasyon/SKILL.md   (79 satır)
+################################################################################
+---
+name: cocuk-video-animasyon
+description: Senaryosu hazır (js/bolum.js + docs/STORYBOARD.md) çocuk eğitim bölümünü kodla canlandırır — Canvas 2D sahneler, Oki karakter motoru, Chromium ile kare kare render, sentez müzik/efekt, ffmpeg ile 1080p MP4. Bölüm klasörü kurma, sahne yazma, görsel kalite kontrolü (önizleme karelerine bakarak), render ve ses birleştirmeyi kapsar. "Animasyonu yap", "sahneleri kodla", "bölümü render et", "videoyu üret" isteklerinde kullan. Önce cocuk-video-senaryo çıktısı gerekir. Görsel okuyabilen model ve terminal erişimi şart.
+license: Özel kullanım. Font Baloo 2 — SIL OFL 1.1.
+compatibility: Node 18+, Python 3.10+, Playwright + Chromium, numpy, pillow, imageio-ffmpeg. Görsel (vision) girdi okuyabilen model gerekir; yoksa kalite kontrol döngüsü çalışmaz.
+metadata:
+  seri: "Oki'nin Deniz Kaşifleri"
+  surum: "1.0"
+---
+
+# Çocuk Video Animasyonu
+
+Bu skill bir **yapım hattıdır**, serbest çizim değil. Karakter, palet, yazı stili, geçişler, müzik ve render motoru sabittir. Her bölümde değişen sadece `js/bolum.js` (senaryo verisi) ve `js/scenes/*.js` (sahneler). Kalite bu ayrımdan gelir: motor tutarlı olduğu için 10. bölüm 1. bölümle aynı seride görünür.
+
+## Değişmez kurallar (nedenleriyle)
+1. **`js/core.js`, `js/octopus.js`, `js/main.js`, `tools/audio.py` dosyalarını değiştirme.** Bunlar serinin kimliği; bir bölüm için değiştirilirse eski bölümlerle tutarsızlık doğar. Eksik bir yardımcı gerekiyorsa `js/props.js` ya da sahne dosyasında öneklerle yaz (`EKLER` ile yüklenir). `tools/dogrula.py` motor değişikliğini yakalar.
+2. **Deterministik çizim:** `Math.random` yasak; `rng(seed)` / `hash(n)` kullan. Render 4 paralel sekmede yapılır; aynı saniye her sekmede aynı kareyi vermezse video titrer.
+3. **Görsel kontrol olmadan sahne "bitti" sayılmaz.** Kod doğru çalışıp yanlış görünebilir (üst üste binen yazı, ekran dışı nesne, boş ekran). Her sahne için önizleme karelerine bakmak zorunlu.
+4. **Ekran yazısı ≤ 3 kelime, BÜYÜK HARF.** İzleyici okuma bilmiyor; yazı sadece vurgu.
+5. **Her görsel, o anki seslendirme satırının anlamını göstermeli.** Süs değil, anlatım.
+
+## İş akışı
+
+### 0. Kurulum (bir kez / her yeni bölümde)
+```bash
+bash <bu-skill>/scripts/yeni_bolum.sh bolumler/02-yunus
+cd bolumler/02-yunus && npm install && npx playwright install chromium
+pip install numpy pillow imageio-ffmpeg
+```
+Senaryo çıktısını yerleştir: `js/bolum.js`, `docs/STORYBOARD.md`. Sonra:
+```bash
+node tools/cues.mjs && python3 tools/dogrula.py      # zaman çizelgesi ve VO denetimi
+```
+
+### 1. Oku (atlama)
+- `references/motor-api.md` — tüm fonksiyonlar, Oki parametreleri, güvenli alanlar.
+- `references/sahne-sozlesmesi.md` — sahne dosyası kuralları ve görsel dil.
+- `references/ornek-sahneler/` — `s01_hook.js`, `s02_title.js`, `s10_outro.js` (kısa, referans stil) ve `s03_hearts.js` (uzun bilgi sahnesi). Yeni sahneler bu yoğunlukta ve bu dilde olmalı.
+
+### 2. Konuk karakter (bölümün hayvanı Oki değilse)
+`js/karakterler/<hayvan>.js` yaz: `draw<Hayvan>(ctx, x, y, s, o, t)` — Oki ile aynı parametre mantığı (eye, mouth, look, blink otomatik, alpha, rot, sx, sy) ve aynı görsel dil: düz dolgu, kontur = `shade(dolgu, -.42)`, beyaz parlama elipsi, iki parlamalı iri gözler, `PAL.blush` yanaklar. `bolum.js` → `EKLER = ['karakterler/<hayvan>']`.
+Önce **karakter sayfası** yap (`karakter.html` kalıbı: 4–6 poz/ifade tek ekranda), `--page=karakter.html` ile önizle, bak, düzelt. Karakter oturmadan sahneye geçme; sonradan karakter düzeltmek bütün sahneleri etkiler.
+
+### 3. Sahneleri yaz — sahne sahne, her biri için döngü
+```
+yaz → node tools/preview.mjs /tmp/pv <6 an> → python3 tools/sheet.py /tmp/pv/f.png /tmp/pv/*.png → görseli OKU → düzelt → bir kez daha bak
+```
+- Önizleme anlarını storyboard vuruşlarından seç (her vuruşun ortası). 960x540 temas föyü token tasarrufu içindir; tek kare detayı gerekirse `--full`.
+- Bakarken `references/kalite-kontrol.md` listesini uygula. En çok görülen kusurlar: yazının karakterle/rozetle çakışması, nesnenin ekran dışına taşması, 3 sn'den uzun boş ekran, ifadenin anlatıyla uyumsuz olması.
+- Sahne başına en fazla 2 düzeltme turu; üçüncüde sorun sürüyorsa sahneyi sadeleştir.
+- **Paralel çalışma** (alt ajan varsa): önce S1, S2 ve S10'u kendin yaz (stil çapası). Kalan bilgi sahnelerini en fazla 2 ajana böl. Her ajana `sahne-sozlesmesi.md` + kendi storyboard bölümü + VO satırları ver. Ajanlar ortak dosyalara dokunmasın. Dönüşte her sahneye kendin bak.
+
+### 4. Bütün denetim (render'dan önce zorunlu)
+```bash
+node tools/cues.mjs && python3 tools/dogrula.py   # GEÇTİ olmalı
+node tools/tara.mjs                               # tüm bölüm 10 fps: JS hatası + boş kare
+```
+
+### 5. Render + ses + birleştirme
+```bash
+node tools/render.mjs                                   # → out/video_sessiz.mp4 (4 sekme paralel, ~4–8 dk)
+python3 tools/audio.py out/cues.json out/muzik_sfx.wav   # müzik + efekt, VO anlarında otomatik kısma
+python3 tools/srt.py out/cues.json out/<bolum>_tr.srt
+ffmpeg -i out/video_sessiz.mp4 -i out/muzik_sfx.wav -c:v copy -c:a aac -b:a 192k -movflags +faststart out/bolum_final.mp4
+```
+ffmpeg yoksa: `python3 -c "import imageio_ffmpeg;print(imageio_ffmpeg.get_ffmpeg_exe())"` yolunu kullan.
+
+### 6. Son kontrol
+- Final MP4'ten 8 kare çıkar (`ffmpeg -ss <t> -i out/bolum_final.mp4 -frames:v 1 ...`), temas föyüne bak: renkler, yazılar, geçişler doğru mu.
+- Süre = `DURATION`, video 1920x1080 30fps, ses 48 kHz stereo.
+- Ses seviyesi: `audio.py` çıktısında tepe ≤ −1 dBFS. Müzik ve efektleri **mutlaka bir insan dinlemeli**; ölçüm "kulağa hoş" olduğunu kanıtlamaz.
+
+## Yapma
+- Motor dosyasını "küçük bir düzeltme" için değiştirme; önce `props.js` / sahne içi çözüm ara.
+- Sahneyi görmeden "tamamlandı" deme; kodun hatasız çalışması doğru göründüğü anlamına gelmez.
+- Yapay zekâ ile üretilmiş dış görsel/video/müzik ekleme: tutarlılık bozulur, telif ve "inauthentic content" riski doğar.
+- Tüm sahneleri tek seferde yazıp sonra kontrol etme; hata birikir. Sahne sahne ilerle.
+- Ekrana cümle yazma; seslendirme metnini ekrana kopyalama.
+
+################################################################################
+### DOSYA: skills/cocuk-video-animasyon/references/sahne-sozlesmesi.md   (43 satır)
+################################################################################
+# Sahne Sözleşmesi ve Görsel Dil
+
+## Dosya kuralları
+- Bir sahne = bir dosya: `js/scenes/sXX_ad.js`. `bolum.js` → `SAHNELER` dizisine adı ekle.
+- Dosyadaki her global fonksiyon/değişken sahne önekiyle başlar: `s07_drawRock`, `s07_hideOki`. Tüm sahneler aynı global alanda yaşar; çakışma sessizce başka sahneyi bozar.
+- `Math.random` yok. `rng(seed)`/`hash(n)`.
+- Her `ctx.save()` bir `ctx.restore()` ile kapanır. `setLineDash` kullandıysan `[]` ile sıfırla.
+- Sahne içi zaman `lt` ile düşün: storyboard'daki "yerel saniye" = `lt`.
+
+## Sahne iskeleti
+```js
+// S5 — DÜŞÜNEN KOLLAR (64–90 sn): tek satırlık sahne özeti
+registerScene({
+  id: 's05_kollar', start: T.s05[0], end: T.s05[1],
+  cues: [{ t: .9, sfx: 'pop', vol: .5 }, { t: 4.6, sfx: 'shimmer' }],
+  draw(ctx, lt, t) {
+    const dur = T.s05[1] - T.s05[0];
+    drawOcean(ctx, t, { depth: .3 });
+    // ... vuruşlar: her biri pop/win/prog ile kendi zaman aralığında
+    factBadge(ctx, 3, 'DÜŞÜNEN KOLLAR', lt, dur);   // en üstte çizilsin diye sonda
+  }
+});
+```
+
+## Görsel dil (serinin imzası)
+- **Düz vektör + kontur:** dolgu rengi, kontur `shade(dolgu, -.42)` ~5–7 px, beyaz yarı saydam parlama elipsi (sol üst), yere `softShadow`.
+- **Sevimli, korkutucu değil:** "düşman" bile sakar ve komik (çatık ama iri gözlü balık). Kan, diş, yaralanma yok.
+- **Karakter ifadesi anlatıya tepki verir:** bilgi şaşırtıcıysa `eye:'surprised'`, zorluksa `brow:'worried'`, başarıda `eye:'happy', mouth:'grin'`. `look` ile konuşulan nesneye baktır.
+- **Tek ana fikir:** aynı anda ekranda bir anlatım odağı. Bölünmüş ekranda anlatılmayan tarafı karart.
+- **Hareket:** her şey zıplayarak girer (`pop`), yumuşak çıkar (`ease.in`). 2–4 sn'de bir yeni vuruş. Durağan anlarda bile hafif salınım (`Math.sin(lt*…)`).
+- **Kamera:** yavaş zoom/pan (`ctx.translate/scale`), ani sarsıntı yok.
+- **Karşılaştırma tekniği:** soyut bilgiyi yan yana koy (biz ↔ o, balık iskeleti ↔ iskeletsiz Oki, gaga ↔ delik).
+- **Sayılar görünür olur:** "3 kalp" → 1-2-3 etiketleri; "8 kol" → kol uçlarında 1–8.
+
+## Efekt sesleri
+- Sadece önemli anlarda: nesne belirmesi (`pop`), bilgi vurgusu (`ding`), dönüşüm (`magic`), doğru cevap (`tada`), hata/durma (`wrong`), geri sayım (`tick`).
+- 10 sn'de ≤ 12 efekt; ikisi arası ≥ 0.12 sn. VO üstüne binenleri `vol .4–.6`.
+- Geçiş "whoosh"u otomatik; ekleme.
+
+## Metin
+- Ekran yazısı ≤ 3 kelime, BÜYÜK HARF, Türkçe karakterler doğru (İ, Ş, Ğ, Ü, Ö, Ç).
+- Seslendirme cümlesini ekrana yazma. Yazı = anahtar kelime ("ANA KALP", "KEMİK YOK!").
+
+################################################################################
+### DOSYA: skills/cocuk-video-animasyon/references/kalite-kontrol.md   (31 satır)
+################################################################################
+# Kalite Kontrol — temas föyüne bakarken
+
+Her sahnede storyboard vuruşlarının ortasından 6 kare al, föye bak ve bu listeyi tek tek uygula. "Muhtemelen iyidir" yok; görmediğin şeyi onaylama.
+
+## Kare başına (her biri için evet/hayır)
+1. **Anlatım:** Bu anda VO ne söylüyor? Ekrandaki ana görsel tam olarak onu mu gösteriyor?
+2. **Okunurluk:** Yazı bir karakterin, nesnenin, rozetin (sol üst) ya da ilerleme göstergesinin (sağ üst) üstüne biniyor mu? Kenara 80 px'ten yakın mı?
+3. **Taşma:** Önemli bir nesne ekranın dışına taşmış ya da kesilmiş mi (kasıtlı giriş/çıkış hariç)?
+4. **Boşluk:** Ekranın büyük kısmı anlamsız boş mu? Sahne aralarında 3 sn'den uzun "sadece arka plan" var mı?
+5. **Karakter:** Oki (veya konuk karakter) tanınır mı, oranları bozuk mu, ifade anlatıyla uyumlu mu, doğru yere mi bakıyor?
+6. **Kalabalık:** Aynı anda birden fazla anlatım odağı var mı? Varsa birini karart ya da sırala.
+7. **Tutarlılık:** Palet dışı renk, farklı kontur kalınlığı, farklı yazı stili var mı?
+8. **Doğruluk:** Görsel bilgiyi yanlış anlatıyor mu (ör. kalp sayısı yanlış, kan rengi karışık)?
+
+## Sahne başına
+- Vuruş sayısı: 2–4 sn'de bir değişim var mı?
+- Sahne son 0.4 sn'de sakin mi (kabarcık perdesi kapanıyor)?
+- İlk 0.4 sn'de kritik bilgi yok mu?
+
+## "AI slop" sinyalleri — görürsen düzelt
+- Karakterin sahneden sahneye farklı görünmesi (renk, oran, göz stili).
+- Anlamsız süs: bilgiyle ilgisiz parıltı, yıldız, konfeti yağmuru.
+- Boş coşku yazıları ("HARİKA!", "MUHTEŞEM!") bilgi yerine.
+- Her sahnenin aynı kompozisyon (ortada karakter + üstte yazı) — kamera, yerleşim, karşılaştırma ile çeşitlendir.
+- Uzun süre hiçbir şeyin değişmemesi ya da tersine, 1 sn'de 4 şeyin birden olması.
+
+## Bölüm sonu (render sonrası)
+- 8 kare final MP4'ten: renk kayması yok, yazılar keskin.
+- Süre, çözünürlük, fps, ses kanalı doğru.
+- Bir insan en az bir kez sesli izledi mi? (Müzik/efekt dengesi ölçümle kanıtlanamaz.)
+
+
+================================================================================
+=== BÖLÜM: MOTOR API
+================================================================================
+
+################################################################################
+### DOSYA: skills/cocuk-video-animasyon/references/motor-api.md   (96 satır)
+################################################################################
+# Motor API — core.js, octopus.js, main.js
+
+Tuval 1920x1080, 30 fps. Koordinat: sol üst (0,0). Tüm fonksiyonlar global.
+
+## Sahne kaydı
+```js
+registerScene({
+  id: 's03_kalpler', start: T.s03[0], end: T.s03[1],
+  transition: 'bubbles',            // varsayılan; 'cut' = kabarcık perdesi yok (özel geçiş yapıyorsan)
+  cues: [{ t: 2.2, sfx: 'heartbeat', vol: .7 }],   // t = sahne içi saniye
+  draw(ctx, lt, t) { ... }          // lt = sahne içi zaman (0'dan), t = mutlak zaman
+});
+```
+- Kabarcık geçişi sahne sınırında ±0.42 sn ekranı kapatır ve "whoosh" sesi otomatik eklenir.
+- `main.js` her karede transform, alpha, composite ve lineDash'i sıfırlar; yine de `save/restore` dengeli olmalı.
+- Sahne içi hata yakalanır ve konsola yazılır. `tools/tara.mjs` bunları raporlar.
+
+## Sabitler
+- `W, H, FPS`. Bölüm verisi (`bolum.js`): `DURATION, T, VO, FACTS, MUSIC, EKLER, SAHNELER`.
+- `PAL` renkleri: `navy` (kontur/yazı), `sea1..3`, `foam/foam2`, `sand/sand2/sand3`, `octo/octoDark/octoLight/sucker`, `blush`, `yellow/yellowDark`, `mint`, `coral`, `pink`, `purple`, `inkCloud`, `heart`, `blueBlood`, `redBlood`, `white`, `seaweed/seaweed2`, `rock/rock2`. Palet dışına çıkma; türev için `mix/shade`.
+- `SFX` (izinli efektler): `pop whoosh bubble ding heartbeat tick tada splat jet sparkle boing swoosh_up magic click drum squish wrong shimmer`.
+
+## Zaman / animasyon
+| Fonksiyon | Döner | Kullanım |
+|---|---|---|
+| `prog(t, a, b)` | 0..1 | a→b aralığında doğrusal ilerleme (kırpılmış) |
+| `ease.out / in / inOut / smooth / outBack / outElastic / inBack(p)` | 0..1 | ilerlemeyi yumuşat |
+| `pop(t, start, dur=.45)` | 0 → ~1.1 → 1 | zıplayarak belirme ölçeği; start'tan önce 0 |
+| `win(t, a, b, fin=.3, fout=.3)` | 0..1 | [a,b] aralığında görünürlük (yumuşak giriş/çıkış) |
+| `beat(t, bpm=80)` | 0..~1 | kalp atışı "lub-dub" darbesi |
+| `lerp, clamp, TAU` | | |
+| `rng(seed)` | fonksiyon | deterministik rastgele: `const r = rng(5); r()` |
+| `hash(n)` | 0..1 | tek seferlik deterministik değer |
+
+Kalıp: `const sc = pop(lt, 2.0) * (1 - ease.in(prog(lt, 6.0, 6.3)));  if (sc > 0) { ... scale(sc) ... }`
+
+## Renk
+`mix(a, b, k)`, `shade(c, ±k)` (+ açık, − koyu), `rgba(c, alpha)`. Kontur rengi kuralı: `shade(dolgu, -.42)`.
+
+## Şekil (yol oluşturur, sonra `fill/stroke` sen çağırırsın)
+`rrect(ctx,x,y,w,h,r)`, `heartPath(ctx,x,y,s)`, `starPath(ctx,x,y,r,n=5,inner=.48)`, `dropPath(ctx,x,y,s)` (sivri uç yukarıda).
+Hazır çizenler: `bubble(ctx,x,y,r,alpha)`, `softShadow(ctx,x,y,rx,ry,alpha)` (yere gölge).
+
+## Yazı (Baloo 2, kalın konturlu çocuk başlığı)
+- `txt(ctx, s, x, y, {size, fill, stroke, sw, weight, align, alpha, scale, rot, shadow})`. Merkez hizalı; `sw` = kontur kalınlığı (varsayılan size×0.17). `sw:0, shadow:false` = düz yazı.
+- `popWords(ctx, s, x, y, lt, start, {size, fill, stagger=.12})`: kelimeler sırayla zıplar.
+- `pill(ctx, s, x, y, {size, fill, color, scale, alpha, border})`: hap etiket.
+- `callout(ctx, x1, y1, x2, y2, s, p, opts)`: noktalı çizgi + etiket; `p` 0..1 (çizgi 0–.6, etiket .6–1).
+- `measure(ctx, s, size)`: piksel genişlik.
+- Türkçe karakterlerin hepsi fontta var. **₂ gibi alt simge yok**: "O" + küçük "2" ayrı çiz.
+
+## Sahne öğeleri
+- `factBadge(ctx, n, 'BAŞLIK', lt, dur)`: sol üst numaralı yıldız rozeti; her bilgi sahnesinde zorunlu.
+- `drawOcean(ctx, t, {depth 0..1, floor=true, floorY=900, seaweed=true, rays=true, camX=0, bubbles=true, particles=true})`: arka plan. `depth` = derinlik (ışık azalır), `camX` = yatay pan (parallax).
+- `drawProgress` ve `bubbleWipe` otomatiktir; çağırma.
+
+## Güvenli alanlar
+- Sol üst **x<950, y<210**: rozet. Sağ üst **x>1440, y<150**: ilerleme yıldızları. Kenarlardan **80 px** içeride kal.
+- Ana karakter için tipik yer: x 700–1250, taban y 650–900.
+
+## Oki — `drawOki(ctx, x, y, s, o, t)`
+`(x, y)` = kolların birleştiği taban noktası. `s=1` → kafa ~220 px yüksek, kafa tepesi `y − 210·s`; kollar ~180·s aşağı uzanır.
+Tipik ölçek: tek başına 1.5–1.9; panel içinde 0.6–0.9.
+
+| Parametre | Değerler |
+|---|---|
+| `pose` | `'idle' 'swim' 'walk' 'squeeze' 'cheer'` veya `blendPose('idle','cheer',k)` / `okiPose(ad)` nesnesi |
+| `eye` | `'open' 'happy' 'closed' 'surprised'`; `blink` 0..1 (verilmezse otomatik kırpar, `seed` ile faz) |
+| `mouth` | `'smile' 'open' 'grin' 'o' 'flat' 'wavy'` |
+| `brow` | `null 'worried' 'determined' 'raised'` |
+| `look` | `{x, y}` −1..1 (göz bebeği yönü; ilgili nesneye baktır) |
+| `color`, `alpha`, `blush` 0..1 | renk değiştirme (kamuflaj), saydamlık, yanak |
+| `rot`, `sx`, `sy` | dönme, esneme/sıkışma (tabana göre) |
+| `xray` 0..1, `hearts` `{bpm, mainStop 0..1, flow, highlight:'gill'|'main'}` | içini gösterir: 3 kalp, solungaç, mavi kan akışı |
+| `neuro` 0..1 | kollarda sinir parıltısı + beyin |
+| `bumps` 0..1, `mottle` `{color, amount, seed}` | deri tümsekleri, kamuflaj lekeleri |
+| `waveArm` 0..1 | sağ dış kol (7) el sallar |
+| `reach` `{arm, x, y, p}` | kol yerel hedefe uzanır; hedefi `okiLocal(dünyaX, dünyaY, x, y, s, o)` ile çevir |
+
+Kol sırası: 0–3 arka (soldan sağa), 4 sol dış, 5 sol iç, 6 sağ iç, 7 sağ dış.
+Yardımcılar: `okiPoint('mainHeart'|'gillHeartL'|'gillHeartR'|'gillL'|'gillR'|'brain'|'eyeL'|'eyeR'|'mouth'|'beak'|'headTop'|'headCenter'|'base', x, y, s, o)` → dünya koordinatı; `okiArmPoint(i, u 0..1, x, y, s, o, t)` → kolun u noktası (u=1 uç). `drawBeak(ctx, x, y, boyut, alpha)`.
+Oki'yi hareket ettirirken aynı `t` kaynağını kullan (lt ya da t); karışırsa göz kırpma ve kol dalgası sıçrar.
+
+## Araçlar
+| Komut | İş |
+|---|---|
+| `node tools/preview.mjs <klasör> <t1> <t2>… [--full] [--page=karakter.html]` | tek kare PNG (varsayılan 960x540) + konsol hataları |
+| `python3 tools/sheet.py çıktı.png a.png b.png …` | 2 sütunlu temas föyü |
+| `node tools/cues.mjs` | `out/cues.json` (sahne, VO, efekt, süre, müzik) |
+| `python3 tools/dogrula.py` | render öncesi denetim (çıkış kodu 1 = hata) |
+| `node tools/tara.mjs [--fps=10]` | tüm bölüm: JS hatası + boş kare |
+| `node tools/render.mjs [--from --to --workers=4]` | MP4 (sessiz) |
+| `python3 tools/audio.py out/cues.json out/muzik_sfx.wav` | müzik + efekt |
+| `python3 tools/srt.py out/cues.json` | altyazı |
+Tarayıcıda canlı izleme: `index.html#play`, belirli an: `index.html#t=95`.
+
+
+================================================================================
+=== BÖLÜM: BÖLÜM 1 VERİSİ
+================================================================================
+
+################################################################################
+### DOSYA: js/bolum.js   (65 satır)
+################################################################################
+// ============================================================
+//  BÖLÜM VERİSİ — bölüme özel her şey burada. Motor dosyaları (core.js, octopus.js, main.js) bölümden bölüme DEĞİŞMEZ.
+//  Bölüm: Ahtapotun 3 Kalbi Var! (Oki'nin Deniz Kaşifleri #1)
+// ============================================================
+const DURATION = 180;
+
+// Sahne zaman aralıkları (saniye, mutlak). Sahne dosyaları bunları kullanır.
+const T = {
+  s01: [0, 10], s02: [10, 18], s03: [18, 44], s04: [44, 64], s05: [64, 90],
+  s06: [90, 116], s07: [116, 140], s08: [140, 157], s09: [157, 170], s10: [170, 180]
+};
+
+// Seslendirme — mutlak zaman. Görseller bu satırlara senkron. SRT buradan üretilir.
+const VO = [
+  [0.5, 2.3, 'Üç kalbi var...'],
+  [2.6, 4.2, 'Kanı mavi...'],
+  [4.5, 6.9, 'Ve kolları kendi kendine düşünebiliyor!'],
+  [7.3, 9.6, 'Sence bu gizemli canlı kim?'],
+  [10.3, 12.4, 'Bu bir ahtapot! Adı Oki.'],
+  [12.8, 17.2, "Hadi, Oki'nin yedi süper gücünü birlikte keşfedelim!"],
+  [18.5, 21.5, 'Birinci süper güç: Ahtapotun tam üç kalbi var!'],
+  [22.0, 27.5, 'İki küçük kalp, kanı solungaçlara pompalar. Böylece ahtapot sudaki oksijeni alır.'],
+  [28.0, 31.5, 'Büyük kalp ise kanı bütün vücuda gönderir.'],
+  [32.2, 36.8, 'Ama ilginç bir şey var: Ahtapot yüzerken büyük kalbi durur!'],
+  [37.4, 43.2, 'O yüzden ahtapotlar yüzmek yerine, kollarıyla yürümeyi sever.'],
+  [44.5, 47.5, 'İkinci süper güç: Ahtapotun kanı mavidir!'],
+  [48.0, 51.8, 'Bizim kanımızda demir var, bu yüzden kırmızı.'],
+  [52.3, 56.3, 'Ahtapotun kanında ise bakır var. Bu da kanı maviye boyar.'],
+  [57.0, 63.2, 'Mavi kan, soğuk ve derin sularda oksijen taşımaya çok yardım eder.'],
+  [64.5, 68.0, 'Üçüncü süper güç: Düşünen kollar!'],
+  [68.5, 74.0, 'Ahtapotun sinir hücrelerinin üçte ikisi kafasında değil, kollarındadır.'],
+  [74.5, 78.2, 'Yani her kol, bir işi kendi başına çözebilir.'],
+  [78.8, 82.8, 'Hatta vantuzlarıyla dokunduğu şeyin tadına bakabilir!'],
+  [83.4, 89.2, 'Düşünsene: Elinle dokunup çileğin tadını almak!'],
+  [90.5, 93.0, 'Dördüncü süper güç... Önce bir soru!'],
+  [93.4, 97.6, 'Sence Oki, bu minicik delikten geçebilir mi?'],
+  [98.0, 99.8, 'Evet mi, hayır mı?'],
+  [100.3, 103.3, 'Üç... iki... bir...'],
+  [103.6, 105.4, 'Cevap: Evet!'],
+  [105.8, 108.4, 'Çünkü ahtapotun hiç kemiği yok.'],
+  [108.8, 115.7, 'Tek sert parçası, papağanınkine benzeyen gagası. Gagası sığarsa, bütün vücudu da sığar!'],
+  [116.5, 119.5, 'Beşinci süper güç: Kamuflaj!'],
+  [120.0, 124.5, 'Ahtapot, göz açıp kapayıncaya kadar rengini değiştirebilir.'],
+  [125.0, 130.5, 'Derisini bile tümsek tümsek yapıp kayaya, kuma ya da mercana benzeyebilir.'],
+  [131.2, 134.2, 'Hadi bakalım... Oki nerede?'],
+  [135.8, 137.8, 'İşte orada!'],
+  [140.5, 143.3, 'Altıncı süper güç: Mürekkep!'],
+  [143.8, 148.3, 'Tehlike gelince ahtapot, koyu bir mürekkep bulutu fışkırtır.'],
+  [148.8, 154.8, 'Düşman şaşırırken, o da suyu hızla püskürtüp jet gibi kaçar. Vınnn!'],
+  [157.5, 161.0, 'Yedinci süper güç: Ahtapot çok zekidir!'],
+  [161.5, 165.0, 'Kapağı kapalı bir kavanozu açabilir.'],
+  [165.4, 169.6, 'Bazı ahtapotlar hindistan cevizi kabuklarını taşıyıp kendine ev bile yapar!'],
+  [170.3, 175.0, 'Üç kalp, mavi kan, düşünen kollar... Ahtapot gerçek bir süper kahraman!'],
+  [175.4, 179.4, 'Bir sonraki bölümde: Yunuslar nasıl uyur? Hoşça kal!']
+];
+
+// Bilgi sahneleri (ilerleme göstergesindeki yıldızlar, sırasıyla)
+const FACTS = [T.s03, T.s04, T.s05, T.s06, T.s07, T.s08, T.s09];
+
+// Müzik yönetimi (tools/audio.py okur): ritmin başladığı an, bitiş akoru, kısık/sessiz aralıklar [başla, bitir, seviye 0..1]
+const MUSIC = { bpm: 104, start: 10.0, end: 178.4, quiet: [[100.4, 103.5, 0], [131.5, 137.7, .35]] };
+
+// Sahne dosyaları (js/scenes/<ad>.js), sırasıyla — index.html bunları yükler
+const SAHNELER = ['s01_hook', 's02_title', 's03_hearts', 's04_blood', 's05_arms', 's06_quiz', 's07_camo', 's08_ink', 's09_smart', 's10_outro'];
+
+################################################################################
+### DOSYA: docs/STORYBOARD.md   (33 satır)
+################################################################################
+# Storyboard: Ahtapotun 3 Kalbi Var!
+
+Toplam 180 sn. Zamanlar mutlak saniyedir. Seslendirme metninin tamamı `js/bolum.js` içindeki `VO` dizisinde duruyor.
+Kurgu mantığı: kanca, ardından 7 numaralı süper güç ve özet. Görsel her 2–4 saniyede bir değişiyor. Ekrandaki yazılar 1–3 kelimelik vurgulardan ibaret.
+
+| Sahne | Zaman | Amaç | Görsel omurga |
+|---|---|---|---|
+| S1 Kanca | 0–10 | İlk 10 saniyede merak uyandırmak | Karanlık okyanusta siluet. Üç ipucu sırayla geliyor: 3 kalp, mavi damla, parlayan kollar. Ardından "?" işaretleri ve "BU KİM?" |
+| S2 Başlık | 10–18 | Karakteri ve vaadi tanıtmak | Işık patlamasıyla silüet Oki'ye dönüşüyor. "AHTAPOT" başlığı ve "Ben OKİ!" balonu çıkıyor. 7 yıldız beliriyor, sonra ilerleme çubuğuna uçuyor |
+| S3 Üç kalp | 18–44 | 1. bilgi | Tarama çizgisi röntgeni açıyor ve kalplere 1-2-3 sayıları geliyor. "SOLUNGAÇ KALBİ" kısmında O₂ kabarcıkları, "ANA KALP" kısmında mavi akış gösteriliyor. Oki yüzmeye başlayınca ana kalp duruyor (⏸, yorgun yüz). Yürümeye geçince kalp yeniden atıyor |
+| S4 Mavi kan | 44–64 | 2. bilgi | Yüzlü mavi damla ile açılıyor. Bölünmüş ekranda solda demir ile kırmızı damla ve çocuk kolu, sağda bakır ile mavi damla var. Sonra derine iniliyor: "SOĞUK" ve "DERİN" |
+| S5 Düşünen kollar | 64–90 | 3. bilgi | Kollar 1'den 8'e sayılıyor. Üç topun biri beyne, ikisi kollara gidiyor: "3'TE 2'Sİ KOLLARDA". Kollar ayrı işler yapıyor. Büyüteçte vantuz ve "MMM!". Son olarak çocuk eli çileğe dokunuyor: "ELİNLE TAT AL!" |
+| S6 Soru | 90–116 | Etkileşim ve izlenme süresini tutmak | Rozette önce "???" yazıyor. Delikli kaya, EVET/HAYIR düğmeleri ve 3-2-1 sayımı geliyor. Cevap EVET: Oki sıkışarak delikten geçiyor. Ardından balık iskeleti ile "KEMİK YOK!", gaga ile papağan karşılaştırması ve "gaga sığarsa bütün Oki sığar" denklemi |
+| S7 Kamuflaj | 116–140 | 5. bilgi ve oyun | Oki her göz kırpışında renk değiştiriyor. KAYA/KUM/MERCAN panellerinde ortama uyuyor. Sonra "OKİ NEREDE?" bölümü: 1.5 sn arama boşluğu ve "İŞTE ORADA!" |
+| S8 Mürekkep | 140–157 | 6. bilgi | Sakar bir orfoz yaklaşıyor. Oki "!" ile mürekkep bulutu fışkırtıyor, balığın gözleri spirale dönüyor. Oki jetle kaçıyor ("VINNN!"), en sonda kayanın arkasından göz kırpıyor |
+| S9 Zekâ | 157–170 | 7. bilgi | Oki'nin başında ampul yanıyor. Kavanoz kapağını çevirip açıyor. Hindistan cevizi kabuklarından ev yapıyor: "EV!" |
+| S10 Kapanış | 170–180 | Özet ve sonraki bölüme bağlamak | 7 madalya ve pelerinli Oki, "SÜPER KAHRAMAN!". Ardından "SONRAKİ BÖLÜM: YUNUSLAR NASIL UYUR?" kartı ve "HOŞÇA KAL!" |
+
+## Değişmeyen format kuralları (seri kimliği)
+- Her bilgi sahnesinde sol üstte numaralı yıldız rozeti (`factBadge`), sağ üstte 7 yıldızlı ilerleme göstergesi var.
+- Sahneler arası geçiş kabarcık perdesiyle yapılıyor ve "whoosh" sesi otomatik.
+- Oki'nin ifadesi anlatıya tepki veriyor: şaşırma, yorgunluk, gülme.
+- Yazılar büyük harf, en fazla 3 kelime. Çocuk okumuyor, yazı sadece vurgu işlevi görüyor.
+- Bölüm, bir sonraki bölümün sorusuyla bitiyor.
+
+## Bilimsel doğrulama notları
+- 3 kalp: 2 solungaç kalbi kanı solungaçlara, 1 sistemik kalp vücuda pompalar. Sistemik kalp yüzerken durur.
+- Mavi kan: hemosiyanin bakır içerir. Soğuk ve oksijeni az sularda avantaj sağlar.
+- Kollar: yaklaşık 500 milyon nöronun 2/3'ü kollardadır. Vantuzlarda kemoreseptör vardır.
+- İskelet yoktur, tek sert kısım gagadır.
+- Kamuflaj: kromatoforlar saniyenin altında renk, papillalar doku değiştirir.
+- Zekâ: kavanoz açabildikleri gözlemlenmiştir. Damarlı ahtapot hindistan cevizi kabuğunu sığınak yapar, bu yüzden metinde "bazı ahtapotlar" deniyor.
+
+################################################################################
+### DOSYA: skills/cocuk-video-senaryo/assets/bolum_sablonu.js   (33 satır)
+################################################################################
+// ============================================================
+//  BÖLÜM VERİSİ — bölüme özel her şey burada. Motor dosyaları (core.js, octopus.js, main.js) DEĞİŞMEZ.
+//  Bölüm: <BAŞLIK> (Oki'nin Deniz Kaşifleri #<NO>)
+//  Tam dolu örnek: cocuk-video-senaryo/references/ornek-bolum-ahtapot.js
+// ============================================================
+const DURATION = 180;
+
+// Sahne zaman aralıkları (saniye, mutlak). Boşluksuz ve 0 → DURATION kesintisiz olmalı.
+const T = {
+  s01: [0, 10], s02: [10, 18], s03: [18, 44], s04: [44, 64], s05: [64, 90],
+  s06: [90, 116], s07: [116, 140], s08: [140, 157], s09: [157, 170], s10: [170, 180]
+};
+
+// Seslendirme — [başla, bitir, 'metin'] mutlak saniye. Görseller buna senkron; SRT ve müzik kısma buradan üretilir.
+// Kural: süre ≈ kelime/2.3 + 0.3 sn; ≤ 2.8 kelime/sn; satır sahne sınırını geçmez; satırlar arası ≥ 0.2 sn.
+const VO = [
+  [0.5, 2.3, '<kanca ipucu 1>'],
+  // ...
+];
+
+// Bilgi sahneleri (ilerleme göstergesindeki 7 yıldız, sırasıyla)
+const FACTS = [T.s03, T.s04, T.s05, T.s06, T.s07, T.s08, T.s09];
+
+// Müzik: ritmin başladığı an (karakterin ortaya çıkışı), bitiş akoru, kısık/sessiz aralıklar [başla, bitir, seviye 0..1]
+// Geri sayımda seviye 0 (sadece tik sesi), arama oyununda 0.35.
+const MUSIC = { bpm: 104, start: 10.0, end: 178.4, quiet: [[100.4, 103.5, 0], [131.5, 137.7, .35]] };
+
+// Ek dosyalar (js/<ad>.js): konuk hayvan karakteri ve ortak nesneler. Sahnelerden ÖNCE yüklenir.
+const EKLER = [];  // ör. ['karakterler/yunus', 'props']
+
+// Sahne dosyaları (js/scenes/<ad>.js), sırasıyla. Ad = T anahtarı + '_' + kısa konu (ör. 's03_kalpler').
+const SAHNELER = ['s01_kanca', 's02_baslik', 's03_', 's04_', 's05_', 's06_soru', 's07_oyun', 's08_', 's09_', 's10_kapanis'];
+
+
+================================================================================
+=== BÖLÜM: ÖRNEK SAHNELER (4 dosya)
+================================================================================
+
+################################################################################
+### DOSYA: js/scenes/s01_hook.js   (63 satır)
+################################################################################
+// S1 — KANCA (0–10 sn): karanlıkta gizemli siluet + 3 ipucu + "Bu kim?"
+registerScene({
+  id: 's01_hook', start: T.s01[0], end: T.s01[1], transition: 'cut',
+  cues: [
+    { t: .55, sfx: 'heartbeat' }, { t: .8, sfx: 'pop', vol: .5 }, { t: 1.05, sfx: 'pop', vol: .5 }, { t: 1.3, sfx: 'pop', vol: .5 },
+    { t: 2.6, sfx: 'whoosh', vol: .5 }, { t: 3.0, sfx: 'bubble' }, { t: 3.15, sfx: 'ding', vol: .6 },
+    { t: 4.5, sfx: 'shimmer' }, { t: 5.0, sfx: 'pop', vol: .6 },
+    { t: 7.3, sfx: 'pop' }, { t: 7.5, sfx: 'pop', vol: .8 }, { t: 7.7, sfx: 'pop', vol: .7 }, { t: 8.0, sfx: 'drum' }
+  ],
+  draw(ctx, lt, t) {
+    const z = 1 + lt * .008;
+    ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-W / 2, -H / 2);
+    drawOcean(ctx, t, { depth: .92, rays: false, floorY: 965 });
+    const g = ctx.createRadialGradient(960, 600, 60, 960, 600, 820);
+    g.addColorStop(0, 'rgba(70,170,255,0.20)'); g.addColorStop(1, 'rgba(0,5,15,0.6)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    // siluet
+    const ox = 960, oy = 700 + Math.sin(lt * 1.6) * 10;
+    const wig = lt > 7.3 ? Math.sin((lt - 7.3) * 14) * .06 * Math.max(0, 1 - (lt - 7.3) / 1.2) : 0;
+    const look = { x: Math.sin(lt * .9) * .8, y: -.2 };
+    drawOki(ctx, ox, oy, 1.55, { color: '#0F2744', neuro: win(lt, 4.5, 11, .6, .1), rot: wig, mouth: lt > 7.3 ? 'o' : 'flat', look, seed: 1 }, lt);
+
+    // ipucu 1: üç kalp (sol)
+    for (let i = 0; i < 3; i++) {
+      const sc = pop(lt, .55 + i * .25, .45); if (!sc) continue;
+      const b = 1 + .14 * beat(lt + i * .05, 84);
+      const hx = 330 + i * 110, hy = 380;
+      ctx.save(); ctx.translate(hx, hy); ctx.scale(sc * b, sc * b);
+      heartPath(ctx, 0, 6, 46); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill();
+      heartPath(ctx, 0, 0, 46); ctx.fillStyle = PAL.heart; ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = PAL.white; ctx.stroke();
+      ctx.restore();
+    }
+    txt(ctx, '3 KALP', 440, 500, { size: 78, fill: PAL.white, scale: pop(lt, 1.35) });
+
+    // ipucu 2: mavi damla (sağ) — yukarıdan düşer, yere çarpınca ezilir
+    if (lt > 2.6) {
+      const f = ease.in(prog(lt, 2.6, 3.0)), dy = lerp(-120, 380, f);
+      const land = prog(lt, 3.0, 3.5), sq = land > 0 ? 1 + .25 * Math.sin(land * Math.PI * 2) * (1 - land) : 1;
+      ctx.save(); ctx.translate(1480, dy); ctx.scale(1 / sq, sq);
+      dropPath(ctx, 0, 6, 52); ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fill();
+      dropPath(ctx, 0, 0, 52); ctx.fillStyle = PAL.blueBlood; ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = PAL.white; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.ellipse(-18, -8, 9, 16, -.4, 0, TAU); ctx.fill();
+      ctx.restore();
+      // sıçrama damlacıkları
+      if (land > 0 && land < 1) for (let k = 0; k < 6; k++) { const a = -Math.PI * (.15 + k * .14); bubble(ctx, 1480 + Math.cos(a) * 140 * land, 440 + Math.sin(a) * 90 * land + 120 * land * land, 9 * (1 - land) + 2, 1 - land); }
+    }
+    txt(ctx, 'MAVİ KAN', 1480, 500, { size: 78, fill: '#9CC9FF', scale: pop(lt, 3.15) });
+
+    // ipucu 3: düşünen kollar
+    const p3 = pop(lt, 4.95) * (1 - ease.in(prog(lt, 7.1, 7.4)));
+    pill(ctx, 'DÜŞÜNEN KOLLAR', 960, 1000, { size: 52, fill: PAL.yellow, scale: p3 });
+
+    // soru
+    [[700, 430, -.25, 7.3], [1230, 400, .22, 7.5], [960, 250, 0, 7.7]].forEach(([qx, qy, r, st]) => {
+      const sc = pop(lt, st, .5); if (!sc) return;
+      txt(ctx, '?', qx, qy + Math.sin(lt * 3 + qx) * 10, { size: 150, fill: PAL.yellow, rot: r + Math.sin(lt * 4 + qx) * .08, scale: sc });
+    });
+    popWords(ctx, 'BU KİM?', 960, 1000, lt, 8.0, { size: 110, fill: PAL.white, stagger: .15 });
+    ctx.restore();
+  }
+});
+
+################################################################################
+### DOSYA: js/scenes/s02_title.js   (57 satır)
+################################################################################
+// S2 — BAŞLIK (10–18 sn): ışık patlaması → Oki ortaya çıkar, 7 süper güç yıldızı → ilerleme çubuğuna uçar
+registerScene({
+  id: 's02_title', start: T.s02[0], end: T.s02[1], transition: 'cut',
+  cues: [
+    { t: 0, sfx: 'magic' }, { t: .3, sfx: 'tada' }, { t: .5, sfx: 'boing', vol: .7 }, { t: 1.6, sfx: 'pop' },
+    { t: 3.3, sfx: 'sparkle' }, { t: 4.1, sfx: 'sparkle', vol: .7 }, { t: 6.7, sfx: 'swoosh_up' }
+  ],
+  draw(ctx, lt, t) {
+    drawOcean(ctx, t, { depth: .15 });
+    // güneş ışını patlaması
+    ctx.save(); ctx.translate(960, 560); ctx.rotate(lt * .15);
+    const ra = .10 + .25 * (1 - ease.out(prog(lt, 0, 1.4)));
+    for (let i = 0; i < 16; i++) { ctx.rotate(TAU / 16); ctx.fillStyle = `rgba(255,250,220,${ra})`; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-90, -1400); ctx.lineTo(90, -1400); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+
+    // Oki: siluetten renge + elastik zıplama
+    const k = ease.out(prog(lt, .05, .6)), sc = lerp(1.55, 1.75, ease.outElastic(prog(lt, .05, 1.1)));
+    const oy = 720 + Math.sin(lt * 2) * 12;
+    softShadow(ctx, 960, 1000, 260, 40, .25);
+    drawOki(ctx, 960, oy, sc, {
+      color: mix('#0F2744', PAL.octo, k), pose: blendPose('idle', 'cheer', win(lt, .3, 2.6, .3, .6)),
+      waveArm: win(lt, 1.4, 6.6, .4, .5), mouth: lt < 2.6 ? 'grin' : 'open', eye: lt > .4 && lt < 1.4 ? 'happy' : 'open', seed: 2
+    }, lt);
+
+    // başlık
+    txt(ctx, 'AHTAPOT', 960, 150, { size: 170, fill: PAL.yellow, sw: 30, scale: pop(lt, .3, .55) * (1 + .02 * Math.sin(lt * 3)) });
+    // isim etiketi
+    const ns = pop(lt, 1.6) * (1 - ease.in(prog(lt, 3.0, 3.3)));
+    if (ns > 0) {
+      ctx.save(); ctx.translate(1420, 470); ctx.scale(ns, ns);
+      ctx.fillStyle = PAL.white; rrect(ctx, -170, -70, 340, 140, 60); ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = PAL.navy; ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-120, 55); ctx.lineTo(-185, 120); ctx.lineTo(-60, 62); ctx.closePath(); ctx.fillStyle = PAL.white; ctx.fill(); ctx.stroke();
+      ctx.fillStyle = PAL.white; ctx.fillRect(-125, 50, 70, 16);
+      txt(ctx, 'Ben OKİ!', 0, 0, { size: 72, fill: PAL.octoDark, sw: 0, shadow: false });
+      ctx.restore();
+    }
+    // 7 yıldız: Oki etrafında yay → sağ üst ilerleme çubuğuna uçar
+    const x0 = W - 80 - 6 * 58;
+    for (let i = 0; i < 7; i++) {
+      const a = Math.PI * (1.05 + i * .15), st = 3.3 + i * .16;
+      const s1 = pop(lt, st, .4); if (!s1) continue;
+      const hx = 960 + Math.cos(a) * 560, hy = 620 + Math.sin(a) * 330 + Math.sin(lt * 3 + i) * 8;
+      const f = ease.inOut(prog(lt, 6.7 + i * .06, 7.5 + i * .06));
+      const x = lerp(hx, x0 + i * 58, f), y = lerp(hy, 90, f), r = lerp(58, 11, f) * s1;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(lt * 2 + i) * .15 * (1 - f));
+      starPath(ctx, 0, 5, r, 5, .5); ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fill();
+      starPath(ctx, 0, 0, r, 5, .5); ctx.fillStyle = PAL.yellow; ctx.fill(); ctx.lineWidth = lerp(7, 3, f); ctx.strokeStyle = PAL.navy; ctx.stroke();
+      if (f < .5) txt(ctx, String(i + 1), 0, 4, { size: r * .78, fill: PAL.navy, sw: 0, shadow: false, alpha: 1 - f * 2 });
+      ctx.restore();
+    }
+    pill(ctx, '7 SÜPER GÜÇ', 960, 1010, { size: 58, fill: PAL.yellow, scale: pop(lt, 3.1) * (1 - ease.in(prog(lt, 7.3, 7.6))) });
+    // S1'den devamlılık: karanlık + beyaz flaş
+    ctx.fillStyle = `rgba(5,15,30,${.85 * (1 - ease.out(prog(lt, 0, .5)))})`; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = `rgba(255,255,255,${.9 * win(lt, 0, .55, .06, .45)})`; ctx.fillRect(0, 0, W, H);
+  }
+});
+
+################################################################################
+### DOSYA: js/scenes/s03_hearts.js   (255 satır)
+################################################################################
+// S3 — ÜÇ KALP (18–44 sn): röntgen taraması → 1-2-3 kalp → solungaç kalpleri + O₂ → ana kalp + mavi akış
+//      → yüzerken ana kalp durur (yorgun Oki) → zemine iner, kollarıyla yürür, kalp yeniden atar
+// Yardımcılar s03_ önekli (global çakışma olmasın)
+function s03_kf(lt, keys) {
+  if (lt <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) if (lt <= keys[i][0]) {
+    const [a, va] = keys[i - 1], [b, vb] = keys[i];
+    return lerp(va, vb, ease.inOut((lt - a) / (b - a)));
+  }
+  return keys[keys.length - 1][1];
+}
+// "O₂": ₂ glifi fontta yok → "O" + küçük "2"
+function s03_o2(ctx, x, y, size, a = 1) {
+  txt(ctx, 'O', x - size * .16, y, { size, fill: PAL.white, stroke: PAL.sea3, sw: size * .22, alpha: a, shadow: false });
+  txt(ctx, '2', x + size * .3, y + size * .26, { size: size * .58, fill: PAL.white, stroke: PAL.sea3, sw: size * .16, alpha: a, shadow: false });
+}
+// Kamera (zoom + dikey merkez) ve yüzme/yürüme hızı → okyanus kaydırma
+function s03_camZ(lt) { return s03_kf(lt, [[4.0, 1.27], [5.2, 1.68], [9.8, 1.68], [11.2, 1]]); }
+function s03_camY(lt) { return s03_kf(lt, [[4.0, 560], [5.2, 515], [9.8, 515], [11.2, 540]]); }
+function s03_speed(u) {
+  return 540 * s03_kf(u, [[14.3, 0], [15.0, 1], [16.3, 1], [18.6, .2], [19.2, 0]]) + 160 * s03_kf(u, [[19.6, 0], [20.5, 1]]);
+}
+function s03_camX(lt) { let x = 0; const dt = 1 / 60; for (let u = 14.3; u < lt; u += dt) x += s03_speed(u) * Math.min(dt, lt - u); return x; }
+// Oki'nin konumu/duruşu (saf zaman fonksiyonu → kabarcık izi için geçmiş anlar da hesaplanabilir)
+function s03_state(lt) {
+  const swimK = s03_kf(lt, [[14.0, 0], [14.6, 1], [18.9, 1], [19.7, 0]]);
+  const walkK = s03_kf(lt, [[19.3, 0], [20.1, 1]]);
+  const idleK = 1 - Math.max(swimK, walkK);
+  const x = s03_kf(lt, [[13.8, 960], [14.7, 870], [16.6, 1000], [18.7, 1050], [19.8, 960]]);
+  let y = s03_kf(lt, [[13.8, 700], [14.7, 640], [16.6, 565], [18.7, 615], [19.8, 712]]);
+  y += Math.sin(lt * 1.6) * 8 * idleK - Math.sin(lt * 1.4 * TAU) * 9 * swimK - Math.abs(Math.sin(lt * 3.45)) * 9 * walkK;
+  const rot = s03_kf(lt, [[14.0, 0], [14.6, .55], [16.6, .5], [18.6, .3], [19.6, 0]]) + walkK * Math.sin(lt * 3.45) * .05;
+  return { x, y, rot, swimK, walkK };
+}
+// Kollarda kalp atışıyla giden mavi parıltı dalgası
+function s03_armFlow(ctx, x, y, s, o, lt, k) {
+  const sp = okiSpines(o, lt), p = lt * 72 / 60, f = p - Math.floor(p);
+  ctx.save(); ctx.translate(x, y); if (o.rot) ctx.rotate(o.rot); ctx.scale(s, s); ctx.globalAlpha *= k;
+  sp.forEach(A => {
+    for (let j = 0; j < 4; j++) {
+      const u = .14 + f * .84 - j * .045; if (u < .14 || u > .98) continue;
+      const pt = A.pts[Math.round(u * ARM_N)], r = armWidth(A.arm, u) * .75 + 4, a = (1 - j * .24) * (1 - Math.pow(f, 3));
+      const g = ctx.createRadialGradient(pt[0], pt[1], 0, pt[0], pt[1], r);
+      g.addColorStop(0, rgba('#CFE4FF', .95 * a)); g.addColorStop(.45, rgba(PAL.blueBlood, .8 * a)); g.addColorStop(1, rgba(PAL.blueBlood, 0));
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pt[0], pt[1], r, 0, TAU); ctx.fill();
+    }
+  });
+  ctx.restore();
+}
+// Duraklat ikonu (⏸ glifi yerine iki çubuk)
+function s03_pause(ctx, x, y, sc, rot = 0) {
+  if (sc <= 0) return;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(sc, sc);
+  ctx.fillStyle = 'rgba(5,20,40,0.25)'; ctx.beginPath(); ctx.arc(0, 6, 50, 0, TAU); ctx.fill();
+  ctx.fillStyle = PAL.white; ctx.beginPath(); ctx.arc(0, 0, 50, 0, TAU); ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = PAL.navy; ctx.stroke();
+  ctx.fillStyle = PAL.heart; rrect(ctx, -22, -24, 15, 48, 6); ctx.fill(); rrect(ctx, 7, -24, 15, 48, 6); ctx.fill();
+  ctx.restore();
+}
+
+registerScene({
+  id: 's03_hearts', start: T.s03[0], end: T.s03[1],
+  cues: [
+    { t: .8, sfx: 'shimmer', vol: .5 },
+    { t: 2.2, sfx: 'pop', vol: .5 }, { t: 2.6, sfx: 'pop', vol: .5 }, { t: 3.0, sfx: 'pop', vol: .6 }, { t: 3.4, sfx: 'heartbeat', vol: .6 },
+    { t: 4.5, sfx: 'ding', vol: .5 }, { t: 5.3, sfx: 'bubble', vol: .5 }, { t: 7.4, sfx: 'bubble', vol: .4 },
+    { t: 10.2, sfx: 'heartbeat', vol: .7 }, { t: 10.9, sfx: 'pop', vol: .5 },
+    { t: 14.2, sfx: 'swoosh_up', vol: .6 }, { t: 15.5, sfx: 'wrong', vol: .5 }, { t: 16.3, sfx: 'pop', vol: .45 },
+    { t: 19.7, sfx: 'boing', vol: .5 }, { t: 20.3, sfx: 'heartbeat', vol: .6 }, { t: 21.0, sfx: 'pop', vol: .55 }, { t: 23.9, sfx: 'sparkle', vol: .5 }
+  ],
+  draw(ctx, lt, t) {
+    const S = 1.5, st = s03_state(lt), z = s03_camZ(lt), cy = s03_camY(lt), camX = s03_camX(lt);
+    const toS = (p) => [(p[0] - 960) * z + 960, (p[1] - cy) * z + 540];
+
+    // ---------- Oki parametreleri ----------
+    const stop = s03_kf(lt, [[14.9, 0], [15.5, 1], [19.7, 1], [20.3, 0]]);
+    const flow = s03_kf(lt, [[10.2, 1], [11.0, 2.4], [13.4, 2.4], [14.2, 1]]) * (1 - stop * .85);
+    const hl = lt > 4.0 && lt < 9.7 ? 'gill' : lt > 10.0 && lt < 13.8 ? 'main' : null;
+    const xray = lt < 2.0 ? 0 : 1 - s03_kf(lt, [[22.6, 0], [23.3, 1]]);
+    const pose = blendPose(blendPose('idle', 'swim', st.swimK), 'walk', st.walkK);
+    let eye = 'open', mouth = 'smile', brow = null, look = { x: 0, y: 0 }, blink;
+    if (lt > .8 && lt < 2.1) look = { x: 0, y: lerp(-.9, .9, prog(lt, .8, 2.0)) };
+    else if (lt >= 2.1 && lt < 4.0) { eye = 'surprised'; mouth = 'open'; brow = 'raised'; look = { x: 0, y: -.6 }; }
+    else if (lt >= 4.0 && lt < 9.8) look = { x: Math.sin(lt * 1.3) * .85, y: -.5 };
+    else if (lt >= 9.8 && lt < 14.0) { mouth = lt < 12 ? 'open' : 'smile'; look = { x: 0, y: lt > 11 ? .8 : 0 }; }
+    else if (lt >= 14.0 && lt < 15.5) { brow = 'determined'; look = { x: .7, y: -.5 }; }
+    else if (lt >= 15.5 && lt < 19.8) { mouth = 'wavy'; brow = 'worried'; blink = .38 + .08 * Math.sin(lt * 2.2); look = { x: -.2, y: .5 }; }
+    else if (lt >= 19.8 && lt < 21.3) { eye = 'happy'; mouth = 'grin'; }
+    else { mouth = lt > 23.8 ? 'grin' : 'smile'; look = { x: .45, y: 0 }; }
+    const o = { pose, rot: st.rot, xray, hearts: { bpm: 72, mainStop: stop, flow, highlight: hl }, eye, mouth, brow, look, blink, seed: 3 };
+
+    // ================= DÜNYA (kamera içinde) =================
+    ctx.save(); ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-960, -cy);
+    drawOcean(ctx, t, { depth: .3, camX });
+    const shA = lerp(.28, .1, st.swimK);
+    softShadow(ctx, st.x, 935, 250 * lerp(1, .7, st.swimK), 36, shA);
+
+    // yüzerken kabarcık izi (kolların arkasından, sola-aşağı kayar)
+    if (lt > 14.3 && lt < 20.5) {
+      for (let k = 0; k < 34; k++) {
+        const tb = 14.3 + k * .14; if (tb > lt || tb > 19.0) continue;
+        const age = lt - tb, life = 1.4; if (age > life) continue;
+        const sb = s03_state(tb), e = okiPoint([hash(k) * 60 - 30, 150], sb.x, sb.y, S, { rot: sb.rot });
+        const dx = -(s03_camX(lt) - s03_camX(tb)) * .9, bx = e[0] + dx - age * 40 + Math.sin(age * 6 + k) * 10, by = e[1] + age * 30 - age * age * 60;
+        bubble(ctx, bx, by, 6 + hash(k * 3) * 12, 1 - age / life);
+      }
+    }
+
+    // Oki (0.8–2.0: tarama çizgisinin geçtiği yerde röntgen açılır)
+    if (lt < 2.0) {
+      drawOki(ctx, st.x, st.y, S, { ...o, xray: 0 }, lt);
+      if (lt > .8) {
+        const sy = lerp(st.y - 345, st.y + 30, ease.inOut(prog(lt, .8, 2.0)));
+        ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, sy); ctx.clip(); drawOki(ctx, st.x, st.y, S, { ...o, xray: 1 }, lt); ctx.restore();
+        // parlak tarama çizgisi
+        const fa = win(lt, .8, 2.0, .15, .2);
+        ctx.save(); ctx.globalAlpha *= fa;
+        let g = ctx.createLinearGradient(0, sy - 70, 0, sy);
+        g.addColorStop(0, 'rgba(120,240,255,0)'); g.addColorStop(1, 'rgba(120,240,255,0.35)');
+        ctx.fillStyle = g; ctx.fillRect(st.x - 250, sy - 70, 500, 70);
+        g = ctx.createLinearGradient(st.x - 260, 0, st.x + 260, 0);
+        g.addColorStop(0, 'rgba(200,250,255,0)'); g.addColorStop(.2, 'rgba(200,250,255,1)'); g.addColorStop(.8, 'rgba(200,250,255,1)'); g.addColorStop(1, 'rgba(200,250,255,0)');
+        ctx.fillStyle = g; ctx.fillRect(st.x - 260, sy - 4, 520, 8);
+        ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.beginPath(); ctx.arc(st.x - 250 + 500 * ((lt * 1.7) % 1), sy, 7, 0, TAU); ctx.fill();
+        ctx.restore();
+      }
+    } else drawOki(ctx, st.x, st.y, S, o, lt);
+
+    // 10.5–13.8: kalbin gönderdiği kan kollara yayılır
+    const fw = win(lt, 10.5, 13.8, .4, .5);
+    if (fw > 0) s03_armFlow(ctx, st.x, st.y, S, o, lt, fw);
+
+    // 4.4–9.5: sudan solungaçlara giren O₂ kabarcıkları
+    if (lt > 4.3 && lt < 9.8) {
+      [-1, 1].forEach(sd => {
+        const gp = okiPoint(sd < 0 ? 'gillL' : 'gillR', st.x, st.y, S, o);
+        let glow = 0;
+        for (let k = 0; k < 6; k++) {
+          const tb = 4.4 + k * .8 + (sd > 0 ? .4 : 0), p = (lt - tb) / 1.8;
+          if (p < 0 || p > 1) { if (p > 1 && p < 1.35) glow = Math.max(glow, 1 - (p - 1) / .35); continue; }
+          const q = ease.inOut(p), sx0 = gp[0] + sd * (300 + hash(k + sd) * 60), sy0 = gp[1] - 70 + hash(k * 7 + sd) * 110;
+          const bx = lerp(sx0, gp[0], q) + Math.sin(p * 9 + k) * 12 * (1 - q), by = lerp(sy0, gp[1], q) - Math.sin(q * Math.PI) * 40;
+          const r = lerp(30, 9, ease.in(p)), a = 1 - prog(p, .82, 1);
+          bubble(ctx, bx, by, r, a);
+          if (r > 15) s03_o2(ctx, bx + 2, by + 2, r * .95, a);
+        }
+        if (glow > 0) { ctx.save(); ctx.globalAlpha *= glow * .7; ctx.fillStyle = PAL.foam; ctx.beginPath(); ctx.arc(gp[0], gp[1], 34 + 18 * (1 - glow), 0, TAU); ctx.fill(); ctx.restore(); }
+      });
+    }
+
+    // yorgunluk: ter damlası
+    if (lt > 16.0 && lt < 19.8) {
+      for (let j = 0; j < 2; j++) {
+        const ph = ((lt - 16.0) / 1.5 + j * .5) % 1, a = Math.sin(ph * Math.PI) * win(lt, 16.0, 19.8, .3, .3);
+        const p = okiPoint([118, -175 + ph * 55], st.x, st.y, S, o);
+        ctx.save(); ctx.globalAlpha *= a; ctx.translate(p[0], p[1]); ctx.rotate(st.rot);
+        dropPath(ctx, 0, 0, 13); ctx.fillStyle = PAL.foam2; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = shade(PAL.sea2, -.2); ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.85)'; ctx.beginPath(); ctx.ellipse(-4, -2, 3, 6, -.3, 0, TAU); ctx.fill();
+        ctx.restore();
+      }
+    }
+    // iniş tozu
+    if (lt > 19.6 && lt < 20.8) {
+      const p = prog(lt, 19.6, 20.8);
+      for (let k = 0; k < 7; k++) {
+        const sd = k % 2 ? 1 : -1, d = 80 + k * 26;
+        ctx.fillStyle = rgba(PAL.sand, .7 * (1 - p)); ctx.beginPath();
+        ctx.arc(st.x + sd * (d + p * 90), 925 - p * 30 - hash(k) * 20, 14 + p * 22, 0, TAU); ctx.fill();
+      }
+    }
+    // kırpma (göz kırpar) — röntgen kapandıktan sonra sağ göz
+    const wink = win(lt, 23.9, 25.7, .12, .1);
+    if (wink > 0 && xray <= 0) {
+      ctx.save(); ctx.translate(st.x, st.y); ctx.rotate(st.rot); ctx.scale(S, S);
+      ctx.fillStyle = PAL.octo; ctx.beginPath(); ctx.ellipse(42, -72, 29, 34, 0, 0, TAU); ctx.fill();
+      ctx.lineCap = 'round'; ctx.lineWidth = 8; ctx.strokeStyle = PAL.navy; ctx.beginPath(); ctx.arc(42, -64, 18, Math.PI * 1.12, Math.PI * 1.88); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+
+    // ================= EKRAN (kamera dışı yazı/etiketler) =================
+    const hL = toS(okiPoint('gillHeartL', st.x, st.y, S, o)), hR = toS(okiPoint('gillHeartR', st.x, st.y, S, o)), hM = toS(okiPoint('mainHeart', st.x, st.y, S, o));
+
+    // hız çizgileri (yüzerken)
+    const vK = st.swimK * s03_speed(lt) / 540;
+    if (vK > .02) {
+      ctx.save(); ctx.lineCap = 'round';
+      for (let i = 0; i < 12; i++) {
+        const len = 160 + hash(i * 5) * 160, span = W + 600;
+        const u = ((hash(i) * span + lt * 1500) % span) - 300;
+        const px = W - u, py = 250 + hash(i * 3 + 1) * 640 + u * .42;
+        ctx.strokeStyle = `rgba(233,252,255,${.75 * clamp(vK * 1.3)})`; ctx.lineWidth = 8 + hash(i * 9) * 6;
+        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - len * .92, py + len * .4); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 2.2 / 2.6 / 3.0: kalplerin yanında 1-2-3
+    const numA = 1 - prog(lt, 3.8, 4.15);
+    if (lt > 2.1 && numA > 0) {
+      ctx.save(); ctx.globalAlpha *= numA;
+      callout(ctx, hL[0], hL[1], 600, 470, '1', prog(lt, 2.0, 2.45), { size: 52, fill: PAL.yellow });
+      callout(ctx, hR[0], hR[1], 1320, 470, '2', prog(lt, 2.4, 2.85), { size: 52, fill: PAL.yellow });
+      callout(ctx, hM[0], hM[1], 960, 245, '3', prog(lt, 2.8, 3.25), { size: 64, fill: PAL.yellow });
+      ctx.restore();
+    }
+    // 4.4–9.6: solungaç kalpleri
+    const gA = 1 - prog(lt, 9.4, 9.8);
+    if (lt > 4.3 && gA > 0) {
+      ctx.save(); ctx.globalAlpha *= gA;
+      callout(ctx, hL[0], hL[1], 390, 720, 'SOLUNGAÇ KALBİ', prog(lt, 4.4, 5.2), { size: 44 });
+      callout(ctx, hR[0], hR[1], 1530, 720, 'SOLUNGAÇ KALBİ', prog(lt, 4.7, 5.5), { size: 44 });
+      ctx.restore();
+    }
+    // 10.2–13.8: ana kalp
+    const mA = 1 - prog(lt, 13.7, 14.1);
+    if (lt > 10.2 && mA > 0) {
+      ctx.save(); ctx.globalAlpha *= mA;
+      callout(ctx, hM[0], hM[1], 1450, 380, 'ANA KALP', prog(lt, 10.3, 11.1), { size: 56, fill: PAL.yellow });
+      ctx.restore();
+    }
+    // 15.5: ana kalp durur → ⏸
+    if (lt > 15.3 && lt < 20.6) {
+      const ip = okiPoint([150, -235], st.x, st.y, S, o), sp = toS(ip);
+      const sc = pop(lt, 15.5, .5) * (1 - ease.in(prog(lt, 19.9, 20.3)));
+      if (sc > 0) {
+        ctx.save(); ctx.lineCap = 'round'; ctx.setLineDash([2, 14]); ctx.lineWidth = 7; ctx.strokeStyle = rgba(PAL.white, .9 * clamp(sc));
+        ctx.beginPath(); ctx.moveTo(hM[0], hM[1]); ctx.lineTo(sp[0], sp[1]); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+        s03_pause(ctx, sp[0], sp[1], sc, Math.sin(lt * 3) * .08);
+      }
+    }
+    // 20.3: kalp yeniden atar → halka
+    if (lt > 20.2 && lt < 21.4) {
+      for (let j = 0; j < 2; j++) {
+        const p = prog(lt, 20.25 + j * .35, 21.0 + j * .35); if (p <= 0 || p >= 1) continue;
+        ctx.save(); ctx.strokeStyle = rgba(PAL.heart, 1 - p); ctx.lineWidth = 10 * (1 - p) + 2;
+        ctx.beginPath(); ctx.arc(hM[0], hM[1], 40 + p * 150, 0, TAU); ctx.stroke(); ctx.restore();
+      }
+    }
+    // yazılar
+    const swA = 1 - prog(lt, 19.0, 19.4);
+    if (lt > 16.2 && swA > 0) { ctx.save(); ctx.globalAlpha *= swA; popWords(ctx, 'YÜZERKEN DURUR!', 960, 975, lt, 16.3, { size: 92, fill: PAL.white, stagger: .18 }); ctx.restore(); }
+    pill(ctx, 'YÜRÜMEK DAHA KOLAY!', 960, 262, { size: 58, fill: PAL.yellow, scale: pop(lt, 21.0, .5) });
+    // göz kırpma parıltısı
+    const spk = pop(lt, 23.95, .4) * (1 - prog(lt, 24.6, 25.2));
+    if (spk > 0) {
+      const ep = toS(okiPoint([108, -125], st.x, st.y, S, o));
+      ctx.save(); ctx.translate(ep[0], ep[1]); ctx.rotate(lt * 2); ctx.scale(spk, spk);
+      starPath(ctx, 0, 0, 30, 4, .35); ctx.fillStyle = PAL.yellow; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = PAL.navy; ctx.stroke();
+      ctx.restore();
+    }
+
+    factBadge(ctx, 1, 'ÜÇ KALP', lt, 26);
+  }
+});
+
+################################################################################
+### DOSYA: js/scenes/s10_outro.js   (123 satır)
+################################################################################
+// S10 — KAPANIŞ (170–180 sn): 7 madalya özeti + pelerinli Oki + sonraki bölüm (yunus) + hoşça kal
+function s10_icon(ctx, type, x, y, r, t) {
+  ctx.save(); ctx.translate(x, y);
+  ctx.fillStyle = 'rgba(5,20,40,0.28)'; ctx.beginPath(); ctx.arc(0, r * .1, r, 0, TAU); ctx.fill();
+  ctx.fillStyle = PAL.white; ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.fill(); ctx.lineWidth = r * .1; ctx.strokeStyle = PAL.navy; ctx.stroke();
+  const k = r / 60; ctx.scale(k, k); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (type === 'heart') { heartPath(ctx, 0, 2, 30 * (1 + .1 * beat(t, 84))); ctx.fillStyle = PAL.heart; ctx.fill(); }
+  else if (type === 'drop') { dropPath(ctx, 0, 8, 22); ctx.fillStyle = PAL.blueBlood; ctx.fill(); }
+  else if (type === 'arm') {
+    ctx.strokeStyle = PAL.octo; ctx.lineWidth = 13; ctx.beginPath();
+    for (let i = 0; i <= 30; i++) { const a = i / 30 * 4.2, rr = 30 - i * .8; ctx.lineTo(-4 + Math.cos(a + 2) * rr, 4 + Math.sin(a + 2) * rr); } ctx.stroke();
+    [[-20, -14], [14, -20], [22, 10]].forEach(([a, b], i) => { ctx.fillStyle = rgba(PAL.yellow, .5 + .5 * Math.sin(t * 6 + i)); ctx.beginPath(); ctx.arc(a, b, 6, 0, TAU); ctx.fill(); });
+  }
+  else if (type === 'bone') {
+    ctx.fillStyle = '#F2EEE6'; ctx.strokeStyle = PAL.navy; ctx.lineWidth = 4;
+    ctx.save(); ctx.rotate(-.6); rrect(ctx, -26, -7, 52, 14, 7); ctx.fill(); ctx.stroke();
+    [[-26, -8], [-26, 8], [26, -8], [26, 8]].forEach(([a, b]) => { ctx.beginPath(); ctx.arc(a, b, 9, 0, TAU); ctx.fill(); ctx.stroke(); }); ctx.restore();
+    ctx.strokeStyle = PAL.heart; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(-34, -34); ctx.lineTo(34, 34); ctx.stroke();
+  }
+  else if (type === 'camo') { [[PAL.octo, -16, -12], [PAL.mint, 16, -12], [PAL.yellow, -16, 16], [PAL.purple, 16, 16]].forEach(([c, a, b]) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(a, b, 14, 0, TAU); ctx.fill(); }); }
+  else if (type === 'ink') { ctx.fillStyle = PAL.inkCloud; [[-14, 6, 20], [10, -8, 22], [18, 12, 16], [-4, -16, 14]].forEach(([a, b, c]) => { ctx.beginPath(); ctx.arc(a, b, c, 0, TAU); ctx.fill(); }); }
+  else if (type === 'bulb') {
+    ctx.fillStyle = PAL.yellow; ctx.beginPath(); ctx.arc(0, -8, 24, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#9AA6B5'; rrect(ctx, -11, 12, 22, 16, 4); ctx.fill();
+    ctx.strokeStyle = PAL.yellowDark; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-7, 8); ctx.lineTo(0, -6); ctx.lineTo(7, 8); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function s10_dolphin(ctx, x, y, s, t) {
+  ctx.save(); ctx.translate(x, y + Math.sin(t * 1.5) * 6); ctx.scale(s, s); ctx.rotate(Math.sin(t * 1.5) * .04);
+  const body = '#7FA7C9', line = shade(body, -.42);
+  ctx.lineJoin = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = line;
+  // kuyruk
+  ctx.fillStyle = shade(body, -.1); ctx.beginPath(); ctx.moveTo(150, -10); ctx.quadraticCurveTo(200, -60, 230, -50); ctx.quadraticCurveTo(205, -10, 225, 30); ctx.quadraticCurveTo(190, 20, 150, 10); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // sırt yüzgeci
+  ctx.beginPath(); ctx.moveTo(-10, -58); ctx.quadraticCurveTo(10, -115, 40, -110); ctx.quadraticCurveTo(30, -80, 45, -52); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // gövde
+  const bodyPath = () => { ctx.beginPath(); ctx.moveTo(-190, 5); ctx.quadraticCurveTo(-200, -12, -160, -22); ctx.quadraticCurveTo(-110, -70, 10, -62); ctx.quadraticCurveTo(120, -50, 160, -5); ctx.quadraticCurveTo(110, 45, 0, 48); ctx.quadraticCurveTo(-120, 50, -165, 22); ctx.quadraticCurveTo(-195, 18, -190, 5); ctx.closePath(); };
+  ctx.fillStyle = body; bodyPath(); ctx.fill();
+  ctx.save(); bodyPath(); ctx.clip(); ctx.fillStyle = '#DCEAF5'; ctx.beginPath(); ctx.ellipse(-30, 50, 170, 34, 0, 0, TAU); ctx.fill(); ctx.restore();
+  bodyPath(); ctx.stroke();
+  // yan yüzgeç
+  ctx.fillStyle = shade(body, -.1); ctx.beginPath(); ctx.moveTo(-40, 18); ctx.quadraticCurveTo(-20, 60, 10, 62); ctx.quadraticCurveTo(0, 35, -5, 16); ctx.closePath(); ctx.fill(); ctx.stroke();
+  // uyuyan göz (tek göz açık aralık — merak uyandırsın)
+  ctx.strokeStyle = PAL.navy; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(-120, -18, 12, Math.PI * .15, Math.PI * .85); ctx.stroke();
+  ctx.fillStyle = rgba(PAL.blush, .4); ctx.beginPath(); ctx.ellipse(-120, 8, 14, 8, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.beginPath(); ctx.ellipse(-60, -45, 40, 9, -.15, 0, TAU); ctx.fill();
+  ctx.restore();
+  // Zzz
+  for (let i = 0; i < 3; i++) {
+    const ph = (t * .5 + i / 3) % 1;
+    txt(ctx, 'z', x - 140 * s + ph * 90, y - 90 * s - ph * 140, { size: 44 + i * 10, fill: PAL.white, alpha: Math.sin(ph * Math.PI), sw: 8 });
+  }
+}
+
+registerScene({
+  id: 's10_outro', start: T.s10[0], end: T.s10[1],
+  cues: [
+    { t: .35, sfx: 'pop', vol: .6 }, { t: 1.15, sfx: 'pop', vol: .6 }, { t: 1.95, sfx: 'pop', vol: .6 },
+    { t: 3.2, sfx: 'magic' }, { t: 3.5, sfx: 'tada', vol: .7 }, { t: 5.3, sfx: 'swoosh_up', vol: .6 }, { t: 8.3, sfx: 'boing', vol: .5 }
+  ],
+  draw(ctx, lt, t) {
+    drawOcean(ctx, t, { depth: .12 });
+    ctx.save(); ctx.translate(960, 620); ctx.rotate(lt * .12);
+    for (let i = 0; i < 14; i++) { ctx.rotate(TAU / 14); ctx.fillStyle = 'rgba(255,250,220,0.10)'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-100, -1400); ctx.lineTo(100, -1400); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+
+    const part2 = ease.inOut(prog(lt, 5.2, 6.0));
+    const ox = lerp(960, 560, part2), oy = 700 + Math.sin(lt * 2.2) * 12, os = lerp(1.6, 1.35, part2);
+    // pelerin (Oki'nin arkasında)
+    const cp = ease.outBack(prog(lt, 3.2, 3.8));
+    if (cp > 0) {
+      ctx.save(); ctx.translate(ox, oy - 60 * os); ctx.scale(os * cp, os * cp);
+      const fl = Math.sin(lt * 5) * 16, fl2 = Math.sin(lt * 5 + 1.2) * 12;
+      ctx.fillStyle = PAL.heart; ctx.strokeStyle = shade(PAL.heart, -.42); ctx.lineWidth = 4; ctx.lineJoin = 'round';
+      ctx.beginPath(); ctx.moveTo(70, 10);
+      ctx.quadraticCurveTo(-60, -40 + fl2, -250 + fl, 20 + fl2);
+      ctx.lineTo(-215 + fl, 70); ctx.lineTo(-250 + fl * .6, 118); ctx.lineTo(-190, 150 + fl2 * .5);
+      ctx.quadraticCurveTo(-60, 150, 20, 90); ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = shade(PAL.heart, -.2); ctx.beginPath(); ctx.moveTo(40, 40); ctx.quadraticCurveTo(-80, 40 + fl2, -200 + fl, 60); ctx.quadraticCurveTo(-90, 95, 20, 80); ctx.closePath(); ctx.fill();
+      starPath(ctx, -150 + fl * .5, 60, 26, 5, .5); ctx.fillStyle = PAL.yellow; ctx.fill(); ctx.lineWidth = 3; ctx.stroke();
+      ctx.restore();
+    }
+    drawOki(ctx, ox, oy, os, {
+      pose: blendPose('idle', 'cheer', win(lt, 3.2, 5.4, .3, .4)), eye: lt > 3.2 && lt < 5.2 ? 'happy' : 'open', mouth: lt > 3.2 ? 'grin' : 'smile',
+      waveArm: win(lt, 8.0, 11, .4, .1), look: part2 > .5 ? { x: .9, y: -.1 } : { x: 0, y: -.3 },
+      reach: { arm: 7, x: 330, y: -150, p: win(lt, 5.8, 8.0, .4, .4) }, seed: 3
+    }, lt);
+
+    // 7 madalya — yay üzerinde
+    const icons = ['heart', 'drop', 'arm', 'bone', 'camo', 'ink', 'bulb'];
+    const starts = [.3, 1.1, 1.9, 3.2, 3.32, 3.44, 3.56];
+    const out = ease.in(prog(lt, 5.0, 5.5));
+    icons.forEach((ic, i) => {
+      const sc = pop(lt, starts[i], .45) * (1 - out); if (sc <= 0) return;
+      const a = Math.PI * (1.12 + i * .127);
+      ic === ic && s10_icon(ctx, ic, 960 + Math.cos(a) * 640, 700 + Math.sin(a) * 470 + Math.sin(lt * 3 + i) * 6, 62 * sc, t);
+    });
+    popWords(ctx, 'SÜPER KAHRAMAN!', 960, 1000, lt, 3.4, { size: 104, fill: PAL.yellow, stagger: .16, alpha: 1 - out });
+
+    // sonraki bölüm kartı
+    const cx = lerp(2400, 1330, ease.outBack(prog(lt, 5.4, 6.2)));
+    if (cx < 2300) {
+      ctx.save(); ctx.translate(cx, 560); ctx.rotate(.02 * Math.sin(lt * 2));
+      ctx.fillStyle = 'rgba(5,20,40,0.3)'; rrect(ctx, -420, -300 + 14, 840, 600, 48); ctx.fill();
+      const g = ctx.createLinearGradient(0, -300, 0, 300); g.addColorStop(0, '#1C3F7A'); g.addColorStop(1, '#0E2450');
+      ctx.fillStyle = g; rrect(ctx, -420, -300, 840, 600, 48); ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = PAL.white; ctx.stroke();
+      // ay + yıldızlar (gece/uyku)
+      ctx.fillStyle = '#FFF3B0'; ctx.beginPath(); ctx.arc(290, -190, 44, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#1C3F7A'; ctx.beginPath(); ctx.arc(310, -205, 40, 0, TAU); ctx.fill();
+      const r = rng(4); for (let i = 0; i < 10; i++) { starPath(ctx, -380 + r() * 560, -270 + r() * 150, 6 + r() * 6, 5, .45); ctx.fillStyle = rgba('#FFF3B0', .5 + .5 * Math.sin(lt * 3 + i)); ctx.fill(); }
+      ctx.restore();
+      pill(ctx, 'SONRAKİ BÖLÜM', cx, 300, { size: 46, fill: PAL.yellow });
+      s10_dolphin(ctx, cx + 10, 590, 1.25, lt);
+      txt(ctx, 'YUNUSLAR NASIL UYUR?', cx, 790, { size: 70, fill: PAL.white, scale: pop(lt, 6.2) });
+    }
+    txt(ctx, 'HOŞÇA KAL!', 560, 190, { size: 120, fill: PAL.yellow, sw: 22, scale: pop(lt, 8.1, .5), rot: Math.sin(lt * 3) * .03 });
+    // son kararma
+    ctx.fillStyle = `rgba(11,37,69,${ease.inOut(prog(lt, 9.35, 9.95))})`; ctx.fillRect(0, 0, W, H);
+  }
+});
+
+
+================================================================================
+=== BÖLÜM: KARAKTER REFERANSI (yunusu bu dille çiz; karakter sayfası kalıbı)
+================================================================================
+
+################################################################################
+### DOSYA: js/octopus.js   (340 satır)
+################################################################################
+// ============================================================
+//  OKİ — ana karakter. drawOki(ctx, x, y, s, o, t)
+//  (x,y): kolların birleştiği taban noktası (kafanın alt ortası). s: ölçek (s=1 → kafa ~220px yüksek, kollar ~180px)
+//  o (hepsi opsiyonel):
+//    pose: 'idle'|'swim'|'walk'|'squeeze'|'cheer' ya da okiPose()/blendPose() nesnesi
+//    color, alpha, rot, sx, sy (squash/stretch, tabana göre)
+//    eye: 'open'|'happy'|'closed'|'surprised'   look: {x,y} (-1..1)   blink: 0..1 (verilmezse otomatik)
+//    mouth: 'smile'|'open'|'o'|'flat'|'wavy'|'grin'   brow: null|'worried'|'determined'|'raised'
+//    xray: 0..1  (içini gösterir: 3 kalp, solungaçlar, mavi kan akışı)
+//    hearts: {bpm:72, mainStop:0..1, flow:1}
+//    neuro: 0..1 (kollarda sinir düğümleri + beyin parlar)
+//    blush: 0..1 (yanak pembesi, varsayılan 1)  bumps: 0..1 (deri tümsekleri), mottle: {color, amount} (kamuflaj lekeleri)
+//    waveArm: 0..1 (sağ dış kol el sallar), reach: {arm, x, y, p} (kol yerel hedefe uzanır; x,y yerel birim)
+//  Dünya koordinatı almak için: okiPoint('mainHeart', x, y, s, o) / okiArmPoint(i, 0..1, x, y, s, o, t)
+// ============================================================
+
+const OKI_POSES = {
+  idle: { spread: 1, curl: 1, waveAmp: .3, waveSpeed: .5, lift: 0, len: 1, walk: 0, pulse: 0 },
+  swim: { spread: .22, curl: .25, waveAmp: .16, waveSpeed: 1.4, lift: 0, len: 1.18, walk: 0, pulse: .5 },
+  walk: { spread: 1.25, curl: .55, waveAmp: .18, waveSpeed: 1.1, lift: 0, len: 1, walk: 1, pulse: 0 },
+  squeeze: { spread: .06, curl: .08, waveAmp: .08, waveSpeed: .8, lift: 0, len: 1.25, walk: 0, pulse: 0 },
+  cheer: { spread: 1.5, curl: 1.35, waveAmp: .42, waveSpeed: 1.2, lift: .38, len: 1, walk: 0, pulse: 0 }
+};
+function okiPose(name) { return { ...OKI_POSES[name] }; }
+function blendPose(a, b, k) {
+  const A = typeof a === 'string' ? OKI_POSES[a] : a, B = typeof b === 'string' ? OKI_POSES[b] : b, r = {};
+  for (const key in A) r[key] = lerp(A[key], B[key], k);
+  return r;
+}
+
+const OKI_ANCHORS = {
+  base: [0, 0], headTop: [0, -210], headCenter: [0, -110],
+  mainHeart: [0, -150], gillHeartL: [-62, -126], gillHeartR: [62, -126], gillL: [-84, -160], gillR: [84, -160],
+  brain: [0, -116], eyeL: [-42, -72], eyeR: [42, -72], mouth: [0, -30], beak: [0, 8]
+};
+
+// dir: -1 sol, 1 sağ. a: dışa açılma. curl: uç kıvrımı (+ dışa, − içe). ph: dalga fazı
+const OKI_ARMS = [
+  { bx: -40, by: -10, dir: -1, a: 1.30, len: 150, w: 24, curl: 1.7, back: true, ph: .3 },
+  { bx: -14, by: -10, dir: -1, a: .52, len: 140, w: 22, curl: -1.2, back: true, ph: 1.9 },
+  { bx: 14, by: -10, dir: 1, a: .52, len: 140, w: 22, curl: -1.2, back: true, ph: 3.1 },
+  { bx: 40, by: -10, dir: 1, a: 1.30, len: 150, w: 24, curl: 1.7, back: true, ph: 4.4 },
+  { bx: -62, by: -2, dir: -1, a: .95, len: 182, w: 31, curl: 1.9, ph: .9 },
+  { bx: -22, by: 4, dir: -1, a: .26, len: 172, w: 30, curl: -1.4, ph: 2.6 },
+  { bx: 22, by: 4, dir: 1, a: .26, len: 172, w: 30, curl: -1.4, ph: 3.8 },
+  { bx: 62, by: -2, dir: 1, a: .95, len: 182, w: 31, curl: 1.9, ph: 5.2 }
+];
+const ARM_N = 40;
+
+function okiSpines(o, t) {
+  const P = typeof o.pose === 'object' ? o.pose : OKI_POSES[o.pose || 'idle'];
+  return OKI_ARMS.map((arm, i) => {
+    const sp = P.spread + P.pulse * .35 * Math.sin(t * P.waveSpeed * TAU);
+    let a0 = Math.PI / 2 - arm.dir * arm.a * sp;
+    a0 += -arm.dir * P.lift * 1.6 * (arm.back ? .8 : 1);
+    a0 += P.walk * .3 * Math.sin(t * P.waveSpeed * TAU + i * 1.7);
+    let curl = -arm.dir * arm.curl * P.curl, len = arm.len * P.len * (1 + .05 * Math.sin(i * 3.1)), wAmp = P.waveAmp;
+    if (i === 7 && o.waveArm > 0) {
+      const k = ease.inOut(clamp(o.waveArm));
+      a0 = lerp(a0, -Math.PI / 2 + .95 + Math.sin(t * 7) * .3, k);
+      curl = lerp(curl, -1.25, k); wAmp = lerp(wAmp, .15, k);
+    }
+    if (o.reach && o.reach.arm === i && o.reach.p > 0) {
+      const k = ease.inOut(clamp(o.reach.p));
+      const dx = o.reach.x - arm.bx, dy = o.reach.y - arm.by;
+      let ta = Math.atan2(dy, dx);
+      while (ta - a0 > Math.PI) ta -= TAU; while (a0 - ta > Math.PI) ta += TAU;
+      a0 = lerp(a0, ta + arm.dir * .12, k); curl = lerp(curl, -arm.dir * .24, k);
+      len = lerp(len, Math.hypot(dx, dy) * 1.03, k); wAmp = lerp(wAmp, .05, k);
+    }
+    const seg = len / ARM_N; let x = arm.bx, y = arm.by;
+    const pts = [[x, y, a0]];
+    for (let k = 1; k <= ARM_N; k++) {
+      const s = k / ARM_N;
+      const ang = a0 + curl * Math.pow(s, 2.2) + wAmp * Math.sin(t * P.waveSpeed * TAU + arm.ph - s * 3) * s;
+      x += Math.cos(ang) * seg; y += Math.sin(ang) * seg; pts.push([x, y, ang]);
+    }
+    return { arm, pts, curl, i };
+  });
+}
+
+function armWidth(arm, s) { return arm.w * Math.pow(1 - s, .78) + 3.2; }
+
+function drawArm(ctx, A, fill, line, suck, o) {
+  const { arm, pts, curl } = A, L = [], R = [];
+  pts.forEach((p, k) => {
+    const w = armWidth(arm, k / ARM_N) / 2, nx = -Math.sin(p[2]), ny = Math.cos(p[2]);
+    L.push([p[0] + nx * w, p[1] + ny * w]); R.push([p[0] - nx * w, p[1] - ny * w]);
+  });
+  const tip = pts[ARM_N], tw = armWidth(arm, 1) / 2;
+  const path = (close) => {
+    ctx.beginPath(); ctx.moveTo(L[0][0], L[0][1]);
+    for (let k = 1; k <= ARM_N; k++) ctx.lineTo(L[k][0], L[k][1]);
+    ctx.arc(tip[0], tip[1], tw, tip[2] + Math.PI / 2, tip[2] - Math.PI / 2, true);
+    for (let k = ARM_N; k >= 0; k--) ctx.lineTo(R[k][0], R[k][1]);
+    if (close) ctx.closePath();
+  };
+  path(true); ctx.fillStyle = fill; ctx.fill();
+  // alt taraf gölgesi (hacim)
+  ctx.save(); path(true); ctx.clip();
+  ctx.beginPath(); for (let k = 0; k <= ARM_N; k++) { const p = pts[k], w = armWidth(arm, k / ARM_N) * .5, sg = curl >= 0 ? 1 : -1; ctx.lineTo(p[0] + (-Math.sin(p[2])) * w * sg * .55, p[1] + Math.cos(p[2]) * w * sg * .55); }
+  ctx.lineWidth = armWidth(arm, .2) * .5; ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.stroke();
+  ctx.restore();
+  // lekeler / tümsekler
+  if (o.mottle && o.mottle.amount > 0) {
+    ctx.save(); ctx.globalAlpha *= o.mottle.amount; ctx.fillStyle = o.mottle.color;
+    for (let k = 3; k < ARM_N; k += 5) { const p = pts[k], w = armWidth(arm, k / ARM_N); ctx.beginPath(); ctx.ellipse(p[0], p[1], w * .42, w * .32, p[2], 0, TAU); ctx.fill(); }
+    ctx.restore();
+  }
+  // vantuzlar (kıvrımın iç tarafında)
+  const sg = curl >= 0 ? 1 : -1;
+  for (let k = 8; k < ARM_N - 1; k += 3) {
+    const p = pts[k], w = armWidth(arm, k / ARM_N), off = w * .36 * sg, r = w * .2;
+    const sx = p[0] - Math.sin(p[2]) * off, sy = p[1] + Math.cos(p[2]) * off;
+    ctx.fillStyle = suck; ctx.beginPath(); ctx.arc(sx, sy, r, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.10)'; ctx.beginPath(); ctx.arc(sx, sy, r * .45, 0, TAU); ctx.fill();
+  }
+  if (o.bumps > 0) {
+    ctx.fillStyle = rgba('#ffffff', .35 * o.bumps);
+    for (let k = 4; k < ARM_N - 4; k += 4) { const p = pts[k], w = armWidth(arm, k / ARM_N), off = -w * .22 * sg; ctx.beginPath(); ctx.arc(p[0] - Math.sin(p[2]) * off, p[1] + Math.cos(p[2]) * off, w * .16 * o.bumps + .5, 0, TAU); ctx.fill(); }
+  }
+  // kontur (taban hariç)
+  ctx.beginPath(); ctx.moveTo(L[0][0], L[0][1]);
+  for (let k = 1; k <= ARM_N; k++) ctx.lineTo(L[k][0], L[k][1]);
+  ctx.arc(tip[0], tip[1], tw, tip[2] + Math.PI / 2, tip[2] - Math.PI / 2, true);
+  for (let k = ARM_N; k >= 0; k--) ctx.lineTo(R[k][0], R[k][1]);
+  ctx.lineJoin = 'round'; ctx.lineWidth = o.lineW ?? 3.4; ctx.strokeStyle = line; ctx.stroke();
+}
+
+function headPath(ctx) {
+  ctx.beginPath(); ctx.moveTo(-80, 8);
+  ctx.bezierCurveTo(-122, -60, -116, -206, 0, -210);
+  ctx.bezierCurveTo(116, -206, 122, -60, 80, 8);
+  ctx.quadraticCurveTo(0, 30, -80, 8); ctx.closePath();
+}
+
+function autoBlink(t, seed = 0) {
+  const period = 3.4, tt = t + seed * 1.37, k = Math.floor(tt / period);
+  const lt = tt - k * period - hash(k + seed * 17) * 1.8;
+  return lt > 0 && lt < .17 ? Math.sin(lt / .17 * Math.PI) : 0;
+}
+
+function drawOki(ctx, x, y, s, o = {}, t = 0) {
+  const col = o.color || PAL.octo;
+  const dark = shade(col, -.16), line = shade(col, -.42), suck = mix(col, '#ffffff', .6);
+  const spines = okiSpines(o, t);
+  ctx.save();
+  ctx.globalAlpha *= (o.alpha ?? 1);
+  ctx.translate(x, y); if (o.rot) ctx.rotate(o.rot); ctx.scale(s * (o.sx ?? 1), s * (o.sy ?? 1));
+
+  // arka kollar
+  spines.filter(A => A.arm.back).forEach(A => drawArm(ctx, A, dark, line, mix(dark, '#ffffff', .45), o));
+
+  // kafa
+  headPath(ctx); ctx.fillStyle = col; ctx.fill();
+  ctx.save(); headPath(ctx); ctx.clip();
+  let g = ctx.createRadialGradient(-45, -150, 0, -45, -150, 110);
+  g.addColorStop(0, 'rgba(255,255,255,0.34)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(-130, -220, 260, 260);
+  g = ctx.createLinearGradient(0, -60, 0, 25); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(60,0,20,0.14)');
+  ctx.fillStyle = g; ctx.fillRect(-130, -60, 260, 90);
+  if (o.mottle && o.mottle.amount > 0) {
+    const r = rng(o.mottle.seed || 5); ctx.globalAlpha *= o.mottle.amount; ctx.fillStyle = o.mottle.color;
+    for (let i = 0; i < 16; i++) { ctx.beginPath(); ctx.ellipse(-100 + r() * 200, -205 + r() * 200, 12 + r() * 24, 9 + r() * 16, r() * 3, 0, TAU); ctx.fill(); }
+  }
+  ctx.restore();
+  // benekler + parlama
+  ctx.fillStyle = rgba(shade(col, .28), .8);
+  [[48, -160, 12], [74, -128, 8], [30, -186, 7], [-66, -172, 6], [84, -170, 5]].forEach(([a, b, r]) => { ctx.beginPath(); ctx.arc(a, b, r, 0, TAU); ctx.fill(); });
+  ctx.save(); ctx.translate(-58, -168); ctx.rotate(-.6); ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.beginPath(); ctx.ellipse(0, 0, 20, 10, 0, 0, TAU); ctx.fill(); ctx.restore();
+  if (o.bumps > 0) {
+    const r = rng(11);
+    for (let i = 0; i < 30; i++) {
+      const bx = -95 + r() * 190, by = -200 + r() * 185, rr = (3 + r() * 7) * o.bumps;
+      if ((bx / 105) ** 2 + ((by + 105) / 108) ** 2 > .8) continue;
+      if (by > -115 && Math.abs(bx) < 80) continue;
+      ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.beginPath(); ctx.arc(bx, by + rr * .35, rr, 0, TAU); ctx.fill();
+      ctx.fillStyle = rgba(shade(col, .25), .9); ctx.beginPath(); ctx.arc(bx, by, rr, 0, TAU); ctx.fill();
+    }
+  }
+  // kafa konturu (alt kenar hariç)
+  ctx.beginPath(); ctx.moveTo(-80, 8);
+  ctx.bezierCurveTo(-122, -60, -116, -206, 0, -210); ctx.bezierCurveTo(116, -206, 122, -60, 80, 8);
+  ctx.lineWidth = o.lineW ?? 3.4; ctx.strokeStyle = line; ctx.stroke();
+
+  if (o.xray > 0) drawXray(ctx, o, t);
+  if (o.neuro > 0) drawBrain(ctx, o.neuro, t);
+
+  // ön kollar (iç olanlar önce)
+  [5, 6, 4, 7].forEach(i => drawArm(ctx, spines[i], col, line, suck, o));
+  if (o.neuro > 0) spines.forEach(A => drawNeurons(ctx, A, o.neuro, t));
+
+  drawFace(ctx, o, t, col, line);
+  ctx.restore();
+}
+
+function drawFace(ctx, o, t, col, line) {
+  const eye = o.eye || 'open', look = o.look || { x: 0, y: 0 };
+  const blink = o.blink ?? autoBlink(t, o.seed || 0);
+  const es = eye === 'surprised' ? 1.14 : 1;
+  // yanaklar
+  ctx.fillStyle = rgba(PAL.blush, .42 * (o.blush ?? 1));
+  [-72, 72].forEach(cx => { ctx.beginPath(); ctx.ellipse(cx, -36, 17, 10, 0, 0, TAU); ctx.fill(); });
+  [-42, 42].forEach(ex => {
+    const ey = -72;
+    if (eye === 'happy') { ctx.lineCap = 'round'; ctx.lineWidth = 8; ctx.strokeStyle = PAL.navy; ctx.beginPath(); ctx.arc(ex, ey + 8, 18, Math.PI * 1.12, Math.PI * 1.88); ctx.stroke(); return; }
+    if (eye === 'closed') { ctx.lineCap = 'round'; ctx.lineWidth = 8; ctx.strokeStyle = PAL.navy; ctx.beginPath(); ctx.arc(ex, ey - 8, 18, Math.PI * .12, Math.PI * .88); ctx.stroke(); return; }
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(ex, ey, 26 * es, 31 * es, 0, 0, TAU);
+    ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 3.5; ctx.strokeStyle = PAL.navy; ctx.stroke(); ctx.clip();
+    const pr = eye === 'surprised' ? 11 : 17, px = ex + look.x * 9, py = ey + 3 + look.y * 11;
+    ctx.fillStyle = PAL.navy; ctx.beginPath(); ctx.arc(px, py, pr, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(px - pr * .38, py - pr * .42, pr * .38, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(px + pr * .36, py + pr * .36, pr * .18, 0, TAU); ctx.fill();
+    if (blink > 0) {
+      const lh = 2 * 31 * es * blink;
+      ctx.fillStyle = col; ctx.fillRect(ex - 40, ey - 31 * es - 2, 80, lh + 2);
+      ctx.lineWidth = 5; ctx.strokeStyle = PAL.navy; ctx.beginPath(); ctx.moveTo(ex - 28, ey - 31 * es + lh); ctx.lineTo(ex + 28, ey - 31 * es + lh); ctx.stroke();
+    }
+    ctx.restore();
+  });
+  // kaşlar
+  if (o.brow) {
+    ctx.lineCap = 'round'; ctx.lineWidth = 7; ctx.strokeStyle = PAL.navy;
+    [-1, 1].forEach(sd => {
+      const bx = sd * 42, by = -118 * (eye === 'surprised' ? 1.03 : 1);
+      ctx.beginPath();
+      if (o.brow === 'worried') { ctx.moveTo(bx - sd * 16, by + 2); ctx.lineTo(bx + sd * 14, by + 10); }
+      else if (o.brow === 'determined') { ctx.moveTo(bx - sd * 16, by + 12); ctx.lineTo(bx + sd * 14, by + 2); }
+      else { ctx.arc(bx, by + 14, 18, Math.PI * 1.2, Math.PI * 1.8); }
+      ctx.stroke();
+    });
+  }
+  // ağız
+  const m = o.mouth || 'smile', my = -30;
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = PAL.navy;
+  if (m === 'smile') { ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0, my - 12, 15, Math.PI * .18, Math.PI * .82); ctx.stroke(); }
+  else if (m === 'open' || m === 'grin') {
+    const w = m === 'grin' ? 26 : 19, h = m === 'grin' ? 24 : 22;
+    ctx.beginPath(); ctx.moveTo(-w, my - 6); ctx.quadraticCurveTo(0, my - 12, w, my - 6); ctx.quadraticCurveTo(w * .9, my + h, 0, my + h); ctx.quadraticCurveTo(-w * .9, my + h, -w, my - 6); ctx.closePath();
+    ctx.fillStyle = '#7A1F35'; ctx.fill();
+    ctx.save(); ctx.clip(); ctx.fillStyle = '#FF7C95'; ctx.beginPath(); ctx.ellipse(0, my + h, w * .7, h * .5, 0, 0, TAU); ctx.fill(); ctx.restore();
+    ctx.lineWidth = 4.5; ctx.stroke();
+  }
+  else if (m === 'o') { ctx.beginPath(); ctx.ellipse(0, my, 10, 13, 0, 0, TAU); ctx.fillStyle = '#7A1F35'; ctx.fill(); ctx.lineWidth = 4.5; ctx.stroke(); }
+  else if (m === 'flat') { ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(-12, my); ctx.lineTo(12, my); ctx.stroke(); }
+  else if (m === 'wavy') { ctx.lineWidth = 5; ctx.beginPath(); for (let i = 0; i <= 12; i++) { const xx = -18 + i * 3; ctx.lineTo(xx, my + Math.sin(i * 1.4) * 4); } ctx.stroke(); }
+}
+
+function drawXray(ctx, o, t) {
+  const xr = clamp(o.xray), H_ = o.hearts || {}, bpm = H_.bpm ?? 72, stop = clamp(H_.mainStop ?? 0), flow = H_.flow ?? (1 - stop * .7);
+  ctx.save(); headPath(ctx); ctx.clip();
+  ctx.fillStyle = rgba(PAL.navy, .62 * xr); ctx.fillRect(-130, -220, 260, 260);
+  ctx.globalAlpha *= xr;
+  // ince tarama çizgileri
+  ctx.strokeStyle = 'rgba(140,220,255,0.10)'; ctx.lineWidth = 2;
+  for (let yy = -210; yy < 30; yy += 14) { ctx.beginPath(); ctx.moveTo(-130, yy); ctx.lineTo(130, yy); ctx.stroke(); }
+  // solungaçlar
+  [-1, 1].forEach(sd => {
+    ctx.save(); ctx.translate(sd * 84, -160); ctx.rotate(sd * .45);
+    ctx.fillStyle = '#9FDcFF'; ctx.beginPath(); ctx.ellipse(0, 0, 13, 30, 0, 0, TAU); ctx.fill();
+    ctx.strokeStyle = 'rgba(20,80,140,0.6)'; ctx.lineWidth = 2.5;
+    for (let k = -22; k <= 22; k += 7) { ctx.beginPath(); ctx.moveTo(-10, k); ctx.lineTo(10, k + 3); ctx.stroke(); }
+    ctx.restore();
+  });
+  // mavi kan akışı
+  ctx.lineCap = 'round'; ctx.lineWidth = 7; ctx.strokeStyle = PAL.blueBlood;
+  ctx.setLineDash([12, 12]); ctx.lineDashOffset = -t * 70 * flow;
+  const vs = [
+    [[-62, -126], [-80, -140], [-84, -160]], [[62, -126], [80, -140], [84, -160]],
+    [[-84, -160], [-50, -196], [0, -150]], [[84, -160], [50, -196], [0, -150]],
+    [[0, -150], [-108, -150], [-96, -14]], [[0, -150], [108, -150], [96, -14]],
+    [[-66, 2], [-72, -60], [-62, -126]], [[66, 2], [72, -60], [62, -126]]
+  ];
+  vs.forEach(([a, c, b]) => { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.quadraticCurveTo(c[0], c[1], b[0], b[1]); ctx.stroke(); });
+  ctx.setLineDash([]);
+  // kalpler
+  const bG = beat(t, bpm), bM = beat(t + .12, bpm) * (1 - stop);
+  const hl = H_.highlight;
+  [[-62, -126], [62, -126]].forEach(([hx, hy]) => {
+    const sz = 17 * (1 + .22 * bG);
+    if (hl === 'gill') { ctx.strokeStyle = rgba(PAL.yellow, .9); ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(hx, hy, sz * (1.7 + .3 * bG), 0, TAU); ctx.stroke(); }
+    heartPath(ctx, hx, hy, sz); ctx.fillStyle = PAL.heart; ctx.fill(); ctx.lineWidth = 3.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+  });
+  const msz = 27 * (1 + .2 * bM);
+  if (hl === 'main') { ctx.strokeStyle = rgba(PAL.yellow, .9); ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0, -150, msz * (1.6 + .25 * bM), 0, TAU); ctx.stroke(); }
+  heartPath(ctx, 0, -150, msz); ctx.fillStyle = mix(PAL.heart, '#8A93A6', stop); ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.stroke();
+  ctx.restore();
+}
+
+function drawBrain(ctx, k, t) {
+  const [bx, by] = OKI_ANCHORS.brain, gl = .6 + .4 * Math.sin(t * 5);
+  ctx.save(); ctx.globalAlpha *= k;
+  ctx.fillStyle = rgba(PAL.yellow, .28 * gl); ctx.beginPath(); ctx.ellipse(bx, by, 52, 30, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#FFB3C7'; ctx.strokeStyle = '#C2507A'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.ellipse(bx - 13, by, 18, 13, 0, 0, TAU); ctx.ellipse(bx + 13, by, 18, 13, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx - 20, by - 3); ctx.quadraticCurveTo(bx - 12, by + 5, bx - 5, by - 4); ctx.moveTo(bx + 6, by + 3); ctx.quadraticCurveTo(bx + 14, by - 6, bx + 22, by + 2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawNeurons(ctx, A, k, t) {
+  ctx.save(); ctx.globalAlpha *= k;
+  for (let n = 6; n < ARM_N - 2; n += 6) {
+    const p = A.pts[n], s = n / ARM_N, puls = .5 + .5 * Math.sin(t * 7 - s * 9 + A.i);
+    const r = (armWidth(A.arm, s) * .16 + 2) * (.8 + .5 * puls);
+    const g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], r * 2.6);
+    g.addColorStop(0, `rgba(255,236,140,${.55 * puls + .2})`); g.addColorStop(1, 'rgba(255,210,63,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p[0], p[1], r * 2.6, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#FFF4C2'; ctx.beginPath(); ctx.arc(p[0], p[1], r * .7, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Yerel çapa noktası → dünya koordinatı
+function okiPoint(name, x, y, s, o = {}) {
+  const [lx, ly] = Array.isArray(name) ? name : OKI_ANCHORS[name];
+  const r = o.rot || 0, ax = lx * s * (o.sx ?? 1), ay = ly * s * (o.sy ?? 1);
+  return [x + Math.cos(r) * ax - Math.sin(r) * ay, y + Math.sin(r) * ax + Math.cos(r) * ay];
+}
+// Dünya → yerel (reach hedefi için)
+function okiLocal(wx, wy, x, y, s, o = {}) {
+  const r = -(o.rot || 0), dx = wx - x, dy = wy - y;
+  return [(Math.cos(r) * dx - Math.sin(r) * dy) / (s * (o.sx ?? 1)), (Math.sin(r) * dx + Math.cos(r) * dy) / (s * (o.sy ?? 1))];
+}
+// i. kolun u (0 taban..1 uç) noktası, dünya koordinatında
+function okiArmPoint(i, u, x, y, s, o, t) {
+  const A = okiSpines(o, t)[i], p = A.pts[Math.round(clamp(u) * ARM_N)];
+  return okiPoint([p[0], p[1]], x, y, s, o);
+}
+
+// Papağan gagası (sahne 6 için)
+function drawBeak(ctx, x, y, sz, a = 1) {
+  ctx.save(); ctx.globalAlpha *= a; ctx.translate(x, y); ctx.scale(sz / 40, sz / 40);
+  ctx.fillStyle = '#3B2B2F'; ctx.strokeStyle = '#1A1215'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(-26, -10); ctx.quadraticCurveTo(0, -42, 30, -12); ctx.quadraticCurveTo(26, 10, 6, 22); ctx.quadraticCurveTo(10, 4, -2, -2); ctx.quadraticCurveTo(-18, -4, -26, -10); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-24, 0); ctx.quadraticCurveTo(-6, 4, 2, 10); ctx.quadraticCurveTo(-4, 26, -22, 18); ctx.quadraticCurveTo(-30, 8, -24, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.beginPath(); ctx.ellipse(-4, -20, 12, 4, -.3, 0, TAU); ctx.fill();
+  ctx.restore();
+}
+
+################################################################################
+### DOSYA: karakter.html   (31 satır)
+################################################################################
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Ahtapot — animasyon</title>
+<style>
+@font-face{font-family:'Baloo 2';font-weight:600;src:url(fonts/baloo-2-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Baloo 2';font-weight:600;src:url(fonts/baloo-2-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo-2-latin-800-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Baloo 2';font-weight:800;src:url(fonts/baloo-2-latin-ext-800-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+A720-A7FF}
+html,body{margin:0;background:#000;overflow:hidden}
+canvas{display:block;width:100vw;height:auto}
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="js/bolum.js"></script><script src="js/core.js"></script><script src="js/octopus.js"></script>
+<script>
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+window.renderFrame=function(t){
+  drawOcean(ctx,t,{depth:.25});
+  drawOki(ctx,330,560,1.25,{pose:'idle',waveArm:1,mouth:'open'},t);
+  drawOki(ctx,800,560,1.25,{pose:'idle',xray:1,hearts:{highlight:'main'},eye:'happy',mouth:'grin'},t);
+  drawOki(ctx,1270,560,1.25,{pose:'cheer',neuro:1,mouth:'o',eye:'surprised',brow:'raised'},t);
+  drawOki(ctx,1700,520,1.0,{pose:'walk',color:'#C9A36B',bumps:1,mottle:{color:'#8C6B3E',amount:.6},mouth:'flat',brow:'determined'},t);
+  drawOki(ctx,400,980,.8,{pose:'swim',rot:-1.2},t);
+  drawOki(ctx,900,1000,.8,{pose:'squeeze',sx:.5,sy:1.3,mouth:'wavy',brow:'worried'},t);
+  factBadge(ctx,3,'SÜPER GÜÇ: ÜÇ KALP ğüşİıöç',t,99); drawProgress(ctx,50);
+  popWords(ctx,'Üç kalp, mavi kan!',1450,900,t,0,{size:90,fill:PAL.yellow});
+};
+window.ready=document.fonts.ready.then(()=>Promise.all([...document.fonts].map(f=>f.load().catch(()=>{}))));
+</script></body></html>

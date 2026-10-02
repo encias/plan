@@ -1,0 +1,977 @@
+[
+ {
+  "scene": "s01_hook",
+  "t": 1.0,
+  "img": "build/kareler/s01_hook_00.jpg",
+  "vo": [
+   "Üç kalbi var..."
+  ],
+  "sfx": [
+   "heartbeat",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s01_hook",
+  "t": 3.0,
+  "img": "build/kareler/s01_hook_01.jpg",
+  "vo": [
+   "Kanı mavi..."
+  ],
+  "sfx": [
+   "bubble",
+   "ding",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s01_hook",
+  "t": 5.0,
+  "img": "build/kareler/s01_hook_02.jpg",
+  "vo": [
+   "Ve kolları kendi kendine düşünebiliyor!"
+  ],
+  "sfx": [
+   "pop",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s01_hook",
+  "t": 7.0,
+  "img": "build/kareler/s01_hook_03.jpg",
+  "vo": [
+   "Ve kolları kendi kendine düşünebiliyor!",
+   "Sence bu gizemli canlı kim?"
+  ],
+  "sfx": [
+   "drum",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s01_hook",
+  "t": 9.0,
+  "img": "build/kareler/s01_hook_04.jpg",
+  "vo": [
+   "Sence bu gizemli canlı kim?"
+  ],
+  "sfx": [
+   "drum",
+   "magic"
+  ]
+ },
+ {
+  "scene": "s02_title",
+  "t": 11.0,
+  "img": "build/kareler/s02_title_00.jpg",
+  "vo": [
+   "Bu bir ahtapot! Adı Oki."
+  ],
+  "sfx": [
+   "boing",
+   "magic",
+   "pop",
+   "tada"
+  ]
+ },
+ {
+  "scene": "s02_title",
+  "t": 13.0,
+  "img": "build/kareler/s02_title_01.jpg",
+  "vo": [
+   "Hadi, Oki'nin yedi süper gücünü birlikte keşfedelim!"
+  ],
+  "sfx": [
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s02_title",
+  "t": 15.0,
+  "img": "build/kareler/s02_title_02.jpg",
+  "vo": [
+   "Hadi, Oki'nin yedi süper gücünü birlikte keşfedelim!"
+  ],
+  "sfx": [
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s02_title",
+  "t": 17.0,
+  "img": "build/kareler/s02_title_03.jpg",
+  "vo": [
+   "Hadi, Oki'nin yedi süper gücünü birlikte keşfedelim!"
+  ],
+  "sfx": [
+   "swoosh_up",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 19.08,
+  "img": "build/kareler/s03_hearts_00.jpg",
+  "vo": [
+   "Birinci süper güç: Ahtapotun tam üç kalbi var!"
+  ],
+  "sfx": [
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 21.25,
+  "img": "build/kareler/s03_hearts_01.jpg",
+  "vo": [
+   "Birinci süper güç: Ahtapotun tam üç kalbi var!"
+  ],
+  "sfx": [
+   "heartbeat",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 23.42,
+  "img": "build/kareler/s03_hearts_02.jpg",
+  "vo": [
+   "İki küçük kalp, kanı solungaçlara pompalar. Böylece ahtapot sudaki oksijeni alır."
+  ],
+  "sfx": [
+   "bubble",
+   "ding"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 25.58,
+  "img": "build/kareler/s03_hearts_03.jpg",
+  "vo": [
+   "İki küçük kalp, kanı solungaçlara pompalar. Böylece ahtapot sudaki oksijeni alır."
+  ],
+  "sfx": [
+   "bubble"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 27.75,
+  "img": "build/kareler/s03_hearts_04.jpg",
+  "vo": [
+   "İki küçük kalp, kanı solungaçlara pompalar. Böylece ahtapot sudaki oksijeni alır.",
+   "Büyük kalp ise kanı bütün vücuda gönderir."
+  ],
+  "sfx": [
+   "heartbeat"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 29.92,
+  "img": "build/kareler/s03_hearts_05.jpg",
+  "vo": [
+   "Büyük kalp ise kanı bütün vücuda gönderir."
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 32.08,
+  "img": "build/kareler/s03_hearts_06.jpg",
+  "vo": [
+   "Ama ilginç bir şey var: Ahtapot yüzerken büyük kalbi durur!"
+  ],
+  "sfx": [
+   "swoosh_up"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 34.25,
+  "img": "build/kareler/s03_hearts_07.jpg",
+  "vo": [
+   "Ama ilginç bir şey var: Ahtapot yüzerken büyük kalbi durur!"
+  ],
+  "sfx": [
+   "pop",
+   "wrong"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 36.42,
+  "img": "build/kareler/s03_hearts_08.jpg",
+  "vo": [
+   "Ama ilginç bir şey var: Ahtapot yüzerken büyük kalbi durur!"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 38.58,
+  "img": "build/kareler/s03_hearts_09.jpg",
+  "vo": [
+   "O yüzden ahtapotlar yüzmek yerine, kollarıyla yürümeyi sever."
+  ],
+  "sfx": [
+   "boing",
+   "heartbeat",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 40.75,
+  "img": "build/kareler/s03_hearts_10.jpg",
+  "vo": [
+   "O yüzden ahtapotlar yüzmek yerine, kollarıyla yürümeyi sever."
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s03_hearts",
+  "t": 42.92,
+  "img": "build/kareler/s03_hearts_11.jpg",
+  "vo": [
+   "O yüzden ahtapotlar yüzmek yerine, kollarıyla yürümeyi sever."
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 45.0,
+  "img": "build/kareler/s04_blood_00.jpg",
+  "vo": [
+   "İkinci süper güç: Ahtapotun kanı mavidir!"
+  ],
+  "sfx": [
+   "boing",
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 47.0,
+  "img": "build/kareler/s04_blood_01.jpg",
+  "vo": [
+   "İkinci süper güç: Ahtapotun kanı mavidir!"
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 49.0,
+  "img": "build/kareler/s04_blood_02.jpg",
+  "vo": [
+   "Bizim kanımızda demir var, bu yüzden kırmızı."
+  ],
+  "sfx": [
+   "click",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 51.0,
+  "img": "build/kareler/s04_blood_03.jpg",
+  "vo": [
+   "Bizim kanımızda demir var, bu yüzden kırmızı."
+  ],
+  "sfx": [
+   "ding",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 53.0,
+  "img": "build/kareler/s04_blood_04.jpg",
+  "vo": [
+   "Ahtapotun kanında ise bakır var. Bu da kanı maviye boyar."
+  ],
+  "sfx": [
+   "click",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 55.0,
+  "img": "build/kareler/s04_blood_05.jpg",
+  "vo": [
+   "Ahtapotun kanında ise bakır var. Bu da kanı maviye boyar."
+  ],
+  "sfx": [
+   "magic"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 57.0,
+  "img": "build/kareler/s04_blood_06.jpg",
+  "vo": [
+   "Mavi kan, soğuk ve derin sularda oksijen taşımaya çok yardım eder."
+  ],
+  "sfx": [
+   "pop",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 59.0,
+  "img": "build/kareler/s04_blood_07.jpg",
+  "vo": [
+   "Mavi kan, soğuk ve derin sularda oksijen taşımaya çok yardım eder."
+  ],
+  "sfx": [
+   "bubble",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 61.0,
+  "img": "build/kareler/s04_blood_08.jpg",
+  "vo": [
+   "Mavi kan, soğuk ve derin sularda oksijen taşımaya çok yardım eder."
+  ],
+  "sfx": [
+   "bubble",
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s04_blood",
+  "t": 63.0,
+  "img": "build/kareler/s04_blood_09.jpg",
+  "vo": [
+   "Mavi kan, soğuk ve derin sularda oksijen taşımaya çok yardım eder."
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 65.08,
+  "img": "build/kareler/s05_arms_00.jpg",
+  "vo": [
+   "Üçüncü süper güç: Düşünen kollar!"
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 67.25,
+  "img": "build/kareler/s05_arms_01.jpg",
+  "vo": [
+   "Üçüncü süper güç: Düşünen kollar!"
+  ],
+  "sfx": [
+   "ding",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 69.42,
+  "img": "build/kareler/s05_arms_02.jpg",
+  "vo": [
+   "Ahtapotun sinir hücrelerinin üçte ikisi kafasında değil, kollarındadır."
+  ],
+  "sfx": [
+   "pop",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 71.58,
+  "img": "build/kareler/s05_arms_03.jpg",
+  "vo": [
+   "Ahtapotun sinir hücrelerinin üçte ikisi kafasında değil, kollarındadır."
+  ],
+  "sfx": [
+   "sparkle",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 73.75,
+  "img": "build/kareler/s05_arms_04.jpg",
+  "vo": [
+   "Ahtapotun sinir hücrelerinin üçte ikisi kafasında değil, kollarındadır."
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s05_arms",
+  "t": 75.92,
+  "img": "build/kareler/s05_arms_05.jpg",
+  "vo": [
+   "Yani her kol, bir işi kendi başına çözebilir."
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 78.08,
+  "img": "build/kareler/s05_arms_06.jpg",
+  "vo": [
+   "Yani her kol, bir işi kendi başına çözebilir."
+  ],
+  "sfx": [
+   "ding",
+   "squish"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 80.25,
+  "img": "build/kareler/s05_arms_07.jpg",
+  "vo": [
+   "Hatta vantuzlarıyla dokunduğu şeyin tadına bakabilir!"
+  ],
+  "sfx": [
+   "pop",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 82.42,
+  "img": "build/kareler/s05_arms_08.jpg",
+  "vo": [
+   "Hatta vantuzlarıyla dokunduğu şeyin tadına bakabilir!"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s05_arms",
+  "t": 84.58,
+  "img": "build/kareler/s05_arms_09.jpg",
+  "vo": [
+   "Düşünsene: Elinle dokunup çileğin tadını almak!"
+  ],
+  "sfx": [
+   "pop",
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 86.75,
+  "img": "build/kareler/s05_arms_10.jpg",
+  "vo": [
+   "Düşünsene: Elinle dokunup çileğin tadını almak!"
+  ],
+  "sfx": [
+   "boing",
+   "pop"
+  ]
+ },
+ {
+  "scene": "s05_arms",
+  "t": 88.92,
+  "img": "build/kareler/s05_arms_11.jpg",
+  "vo": [
+   "Düşünsene: Elinle dokunup çileğin tadını almak!"
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 91.08,
+  "img": "build/kareler/s06_quiz_00.jpg",
+  "vo": [
+   "Dördüncü süper güç... Önce bir soru!"
+  ],
+  "sfx": [
+   "drum"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 93.25,
+  "img": "build/kareler/s06_quiz_01.jpg",
+  "vo": [
+   "Dördüncü süper güç... Önce bir soru!",
+   "Sence Oki, bu minicik delikten geçebilir mi?"
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 95.42,
+  "img": "build/kareler/s06_quiz_02.jpg",
+  "vo": [
+   "Sence Oki, bu minicik delikten geçebilir mi?"
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 97.58,
+  "img": "build/kareler/s06_quiz_03.jpg",
+  "vo": [
+   "Sence Oki, bu minicik delikten geçebilir mi?"
+  ],
+  "sfx": [
+   "boing"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 99.75,
+  "img": "build/kareler/s06_quiz_04.jpg",
+  "vo": [
+   "Evet mi, hayır mı?"
+  ],
+  "sfx": [
+   "tick"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 101.92,
+  "img": "build/kareler/s06_quiz_05.jpg",
+  "vo": [
+   "Üç... iki... bir..."
+  ],
+  "sfx": [
+   "tick"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 104.08,
+  "img": "build/kareler/s06_quiz_06.jpg",
+  "vo": [
+   "Cevap: Evet!"
+  ],
+  "sfx": [
+   "squish",
+   "tada"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 106.25,
+  "img": "build/kareler/s06_quiz_07.jpg",
+  "vo": [
+   "Çünkü ahtapotun hiç kemiği yok."
+  ],
+  "sfx": [
+   "pop",
+   "shimmer",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 108.42,
+  "img": "build/kareler/s06_quiz_08.jpg",
+  "vo": [
+   "Çünkü ahtapotun hiç kemiği yok."
+  ],
+  "sfx": [
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 110.58,
+  "img": "build/kareler/s06_quiz_09.jpg",
+  "vo": [
+   "Tek sert parçası, papağanınkine benzeyen gagası. Gagası sığarsa, bütün vücudu da sığar!"
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 112.75,
+  "img": "build/kareler/s06_quiz_10.jpg",
+  "vo": [
+   "Tek sert parçası, papağanınkine benzeyen gagası. Gagası sığarsa, bütün vücudu da sığar!"
+  ],
+  "sfx": [
+   "bubble",
+   "ding",
+   "squish"
+  ]
+ },
+ {
+  "scene": "s06_quiz",
+  "t": 114.92,
+  "img": "build/kareler/s06_quiz_11.jpg",
+  "vo": [
+   "Tek sert parçası, papağanınkine benzeyen gagası. Gagası sığarsa, bütün vücudu da sığar!"
+  ],
+  "sfx": [
+   "tada",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 117.0,
+  "img": "build/kareler/s07_camo_00.jpg",
+  "vo": [
+   "Beşinci süper güç: Kamuflaj!"
+  ],
+  "sfx": [
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 119.0,
+  "img": "build/kareler/s07_camo_01.jpg",
+  "vo": [
+   "Beşinci süper güç: Kamuflaj!"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s07_camo",
+  "t": 121.0,
+  "img": "build/kareler/s07_camo_02.jpg",
+  "vo": [
+   "Ahtapot, göz açıp kapayıncaya kadar rengini değiştirebilir."
+  ],
+  "sfx": [
+   "magic"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 123.0,
+  "img": "build/kareler/s07_camo_03.jpg",
+  "vo": [
+   "Ahtapot, göz açıp kapayıncaya kadar rengini değiştirebilir."
+  ],
+  "sfx": [
+   "magic"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 125.0,
+  "img": "build/kareler/s07_camo_04.jpg",
+  "vo": [
+   "Derisini bile tümsek tümsek yapıp kayaya, kuma ya da mercana benzeyebilir."
+  ],
+  "sfx": [
+   "pop",
+   "shimmer",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 127.0,
+  "img": "build/kareler/s07_camo_05.jpg",
+  "vo": [
+   "Derisini bile tümsek tümsek yapıp kayaya, kuma ya da mercana benzeyebilir."
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 129.0,
+  "img": "build/kareler/s07_camo_06.jpg",
+  "vo": [
+   "Derisini bile tümsek tümsek yapıp kayaya, kuma ya da mercana benzeyebilir."
+  ],
+  "sfx": [
+   "pop",
+   "shimmer"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 131.0,
+  "img": "build/kareler/s07_camo_07.jpg",
+  "vo": [
+   "Hadi bakalım... Oki nerede?"
+  ],
+  "sfx": [
+   "drum",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 133.0,
+  "img": "build/kareler/s07_camo_08.jpg",
+  "vo": [
+   "Hadi bakalım... Oki nerede?"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s07_camo",
+  "t": 135.0,
+  "img": "build/kareler/s07_camo_09.jpg",
+  "vo": [],
+  "sfx": [
+   "tada",
+   "tick"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 137.0,
+  "img": "build/kareler/s07_camo_10.jpg",
+  "vo": [
+   "İşte orada!"
+  ],
+  "sfx": [
+   "boing",
+   "magic"
+  ]
+ },
+ {
+  "scene": "s07_camo",
+  "t": 139.0,
+  "img": "build/kareler/s07_camo_11.jpg",
+  "vo": [],
+  "sfx": [
+   "boing",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 141.06,
+  "img": "build/kareler/s08_ink_00.jpg",
+  "vo": [
+   "Altıncı süper güç: Mürekkep!"
+  ],
+  "sfx": [
+   "bubble"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 143.19,
+  "img": "build/kareler/s08_ink_01.jpg",
+  "vo": [
+   "Altıncı süper güç: Mürekkep!"
+  ],
+  "sfx": [
+   "boing"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 145.31,
+  "img": "build/kareler/s08_ink_02.jpg",
+  "vo": [
+   "Tehlike gelince ahtapot, koyu bir mürekkep bulutu fışkırtır."
+  ],
+  "sfx": [
+   "bubble"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 147.44,
+  "img": "build/kareler/s08_ink_03.jpg",
+  "vo": [
+   "Tehlike gelince ahtapot, koyu bir mürekkep bulutu fışkırtır."
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s08_ink",
+  "t": 149.56,
+  "img": "build/kareler/s08_ink_04.jpg",
+  "vo": [
+   "Düşman şaşırırken, o da suyu hızla püskürtüp jet gibi kaçar. Vınnn!"
+  ],
+  "sfx": [
+   "jet"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 151.69,
+  "img": "build/kareler/s08_ink_05.jpg",
+  "vo": [
+   "Düşman şaşırırken, o da suyu hızla püskürtüp jet gibi kaçar. Vınnn!"
+  ],
+  "sfx": [
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 153.81,
+  "img": "build/kareler/s08_ink_06.jpg",
+  "vo": [
+   "Düşman şaşırırken, o da suyu hızla püskürtüp jet gibi kaçar. Vınnn!"
+  ],
+  "sfx": [
+   "swoosh_up",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s08_ink",
+  "t": 155.94,
+  "img": "build/kareler/s08_ink_07.jpg",
+  "vo": [],
+  "sfx": [
+   "pop",
+   "sparkle",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s09_smart",
+  "t": 158.08,
+  "img": "build/kareler/s09_smart_00.jpg",
+  "vo": [
+   "Yedinci süper güç: Ahtapot çok zekidir!"
+  ],
+  "sfx": [
+   "ding",
+   "sparkle"
+  ]
+ },
+ {
+  "scene": "s09_smart",
+  "t": 160.25,
+  "img": "build/kareler/s09_smart_01.jpg",
+  "vo": [
+   "Yedinci süper güç: Ahtapot çok zekidir!"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s09_smart",
+  "t": 162.42,
+  "img": "build/kareler/s09_smart_02.jpg",
+  "vo": [
+   "Kapağı kapalı bir kavanozu açabilir."
+  ],
+  "sfx": [
+   "click",
+   "squish"
+  ]
+ },
+ {
+  "scene": "s09_smart",
+  "t": 164.58,
+  "img": "build/kareler/s09_smart_03.jpg",
+  "vo": [
+   "Kapağı kapalı bir kavanozu açabilir."
+  ],
+  "sfx": [
+   "pop",
+   "tada",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s09_smart",
+  "t": 166.75,
+  "img": "build/kareler/s09_smart_04.jpg",
+  "vo": [
+   "Bazı ahtapotlar hindistan cevizi kabuklarını taşıyıp kendine ev bile yapar!"
+  ],
+  "sfx": [
+   "boing"
+  ]
+ },
+ {
+  "scene": "s09_smart",
+  "t": 168.92,
+  "img": "build/kareler/s09_smart_05.jpg",
+  "vo": [
+   "Bazı ahtapotlar hindistan cevizi kabuklarını taşıyıp kendine ev bile yapar!"
+  ],
+  "sfx": [
+   "click",
+   "ding",
+   "whoosh"
+  ]
+ },
+ {
+  "scene": "s10_outro",
+  "t": 171.0,
+  "img": "build/kareler/s10_outro_00.jpg",
+  "vo": [
+   "Üç kalp, mavi kan, düşünen kollar... Ahtapot gerçek bir süper kahraman!"
+  ],
+  "sfx": [
+   "pop"
+  ]
+ },
+ {
+  "scene": "s10_outro",
+  "t": 173.0,
+  "img": "build/kareler/s10_outro_01.jpg",
+  "vo": [
+   "Üç kalp, mavi kan, düşünen kollar... Ahtapot gerçek bir süper kahraman!"
+  ],
+  "sfx": [
+   "magic",
+   "tada"
+  ]
+ },
+ {
+  "scene": "s10_outro",
+  "t": 175.0,
+  "img": "build/kareler/s10_outro_02.jpg",
+  "vo": [
+   "Üç kalp, mavi kan, düşünen kollar... Ahtapot gerçek bir süper kahraman!"
+  ],
+  "sfx": [
+   "swoosh_up"
+  ]
+ },
+ {
+  "scene": "s10_outro",
+  "t": 177.0,
+  "img": "build/kareler/s10_outro_03.jpg",
+  "vo": [
+   "Bir sonraki bölümde: Yunuslar nasıl uyur? Hoşça kal!"
+  ],
+  "sfx": []
+ },
+ {
+  "scene": "s10_outro",
+  "t": 179.0,
+  "img": "build/kareler/s10_outro_04.jpg",
+  "vo": [
+   "Bir sonraki bölümde: Yunuslar nasıl uyur? Hoşça kal!"
+  ],
+  "sfx": [
+   "boing"
+  ]
+ }
+]
